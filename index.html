@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus PDF Studio — Ultra-Fast Offline PDF & Study Suite</title>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --surface: #131a2a;
+      --surface-2: #1b2438;
+      --border: #283552;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-2: #8b5cf6;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 14px 35px rgba(0, 0, 0, 0.45);
+    }
+
+    [data-theme="light"] {
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      --surface-2: #eef2f9;
+      --border: #d8e0ee;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #4f46e5;
+      --accent-2: #7c3aed;
+      --accent-glow: rgba(79, 70, 229, 0.16);
+      --success: #059669;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.25s ease, color 0.25s ease;
+      line-height: 1.5;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 14px 24px;
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      cursor: pointer;
+      letter-spacing: -0.3px;
+    }
+    .brand-badge {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .pill-btn {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.12s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+    .pill-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .pill-btn:active { transform: scale(0.97); }
+
+    /* Hero & Search */
+    .container { max-width: 1220px; margin: 0 auto; padding: 26px 20px 60px; }
+    .hero { text-align: center; margin-bottom: 26px; }
+    .hero h1 {
+      font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      margin-bottom: 8px;
+    }
+    .hero p { color: var(--muted); max-width: 680px; margin: 0 auto 18px; font-size: 0.98rem; }
+
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .search-input {
+      width: 100%;
+      max-width: 360px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+    .cat-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.86rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .cat-btn.active, .cat-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Tool Grid */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+      gap: 16px;
+    }
+    .tool-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .tool-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: var(--shadow);
+    }
+    .tool-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--surface-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+    .tool-tag {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+    .tool-card h3 { font-size: 1.05rem; font-weight: 700; }
+    .tool-card p { font-size: 0.86rem; color: var(--muted); }
+
+    /* Workspace Panel */
+    .workspace {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.2s ease;
+    }
+    .workspace.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .ws-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .ws-title { display: flex; align-items: center; gap: 12px; }
+    .ws-title h2 { font-size: 1.35rem; font-weight: 800; }
+
+    /* Dropzone */
+    .dropzone {
+      border: 2px dashed var(--border);
+      background: var(--surface-2);
+      border-radius: 16px;
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      margin-bottom: 18px;
+    }
+    .dropzone.dragover, .dropzone:hover {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 10%, var(--surface-2));
+    }
+    .dropzone-icon { font-size: 2.4rem; margin-bottom: 8px; }
+    .dropzone h4 { font-size: 1.05rem; margin-bottom: 4px; }
+    .dropzone span { font-size: 0.85rem; color: var(--muted); }
+
+    /* File List */
+    .file-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+    }
+    .file-meta { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+    .file-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 420px; }
+    .file-size { color: var(--muted); font-size: 0.8rem; flex-shrink: 0; }
+    .file-controls { display: flex; gap: 6px; flex-shrink: 0; }
+    .mini-btn {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 9px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .mini-btn:hover { border-color: var(--accent); }
+    .mini-btn.del:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* Options Form */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 0.84rem; font-weight: 700; color: var(--muted); }
+    .field input, .field select, .field textarea {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      outline: none;
+      font-family: inherit;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+
+    /* Primary & Download Buttons */
+    .primary-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 22px var(--accent-glow);
+      transition: transform 0.12s ease, opacity 0.2s ease;
+    }
+    .primary-btn:hover { transform: translateY(-1px); }
+    .primary-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .result-box {
+      display: none;
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--success) 12%, var(--surface-2));
+      border: 1px solid var(--success);
+      text-align: center;
+    }
+    .result-box.active { display: block; }
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 11px 22px;
+      border-radius: 10px;
+      background: var(--success);
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    /* Visual Page Organizer Grid */
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .thumb-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .thumb-card canvas {
+      width: 100%;
+      height: 165px;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 8px;
+      transition: transform 0.2s ease;
+    }
+    .thumb-actions { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+
+    .status-bar {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-align: center;
+      min-height: 22px;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="brand" onclick="goHome()">
+      <span class="brand-badge">⚡ NEXUS</span>
+      <span>PDF Studio</span>
+    </div>
+    <div class="nav-actions">
+      <button class="pill-btn" id="soundToggle" onclick="toggleSound()">🔊 Sound: ON</button>
+      <button class="pill-btn" id="themeToggle" onclick="toggleTheme()">☀️ Light Mode</button>
+    </div>
+  </nav>
+
+  <main class="container">
+    <!-- Home View -->
+    <section id="homeView">
+      <div class="hero">
+        <h1>All-in-One Offline PDF & Study Studio 🚀</h1>
+        <p>100% browser-powered WebAssembly & Canvas engine. Your PDFs and images never leave your device—zero uploads, zero server lag, instant downloads.</p>
+        <div class="controls-bar">
+          <input type="text" id="searchBox" class="search-input" placeholder="🔍 Search tools (e.g., Merge, JPG, Compress, Split)..." oninput="renderGrid()" />
+          <button class="cat-btn active" data-cat="all" onclick="setCategory('all', this)">All (16)</button>
+          <button class="cat-btn" data-cat="organize" onclick="setCategory('organize', this)">Organize</button>
+          <button class="cat-btn" data-cat="convert" onclick="setCategory('convert', this)">Converters</button>
+          <button class="cat-btn" data-cat="edit" onclick="setCategory('edit', this)">Edit & Optimize</button>
+          <button class="cat-btn" data-cat="bonus" onclick="setCategory('bonus', this)">Bonus Studio</button>
+        </div>
+      </div>
+      <div class="tools-grid" id="toolsGrid"></div>
+    </section>
+
+    <!-- Active Tool Workspace -->
+    <section id="workspace" class="workspace">
+      <div class="ws-header">
+        <div class="ws-title">
+          <span id="wsIcon" style="font-size:1.8rem;">📄</span>
+          <div>
+            <h2 id="wsTitle">Tool Name</h2>
+            <p id="wsDesc" style="color:var(--muted);font-size:0.88rem;"></p>
+          </div>
+        </div>
+        <button class="pill-btn" onclick="goHome()">⬅️ Back to All Tools</button>
+      </div>
+
+      <div id="dropzoneWrap">
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+          <div class="dropzone-icon">📥</div>
+          <h4 id="dropTitle">Drag & drop files here, or click to upload</h4>
+          <span id="dropSub">Supports local files directly in browser memory</span>
+          <input type="file" id="fileInput" hidden />
+        </div>
+      </div>
+
+      <div id="fileList" class="file-list"></div>
+      <div id="thumbGrid" class="thumb-grid" style="display:none;"></div>
+      <div id="toolOptions" class="options-grid"></div>
+
+      <button id="runBtn" class="primary-btn" onclick="executeTool()">⚡ Process & Download</button>
+      <div id="statusBar" class="status-bar"></div>
+      <div id="resultBox" class="result-box"></div>
+    </section>
+
+    <footer class="footer">
+      ⚡ Nexus PDF Studio • 100% Client-Side Processing • Zero Server Load
+    </footer>
+  </main>
+
+<script>
+  // Configure PDF.js worker
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+  const { PDFDocument, rgb, degrees, StandardFonts } = PDFLib;
+
+  // ==================== SOUND ENGINE (WEB AUDIO API) ====================
+  let soundEnabled = localStorage.getItem("nexus_sound") !== "off";
+  let audioCtx = null;
+
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playTone(freq, endFreq, duration, type = "sine", gainVal = 0.06, delay = 0) {
+    if (!soundEnabled) return;
+    try {
+      const ctx = getAudioCtx();
+      const now = ctx.currentTime + delay;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+      if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+      gain.gain.setValueAtTime(gainVal, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + duration);
+    } catch (e) {}
+  }
+
+  const SoundFX = {
+    click: () => playTone(680, 920, 0.038, "triangle", 0.055),
+    upload: () => { playTone(520, 660, 0.06, "sine", 0.06, 0); playTone(660, 880, 0.08, "sine", 0.06, 0.05); },
+    success: () => {
+      playTone(523.25, null, 0.12, "sine", 0.06, 0);
+      playTone(659.25, null, 0.12, "sine", 0.06, 0.07);
+      playTone(783.99, null, 0.14, "sine", 0.06, 0.14);
+      playTone(1046.5, null, 0.24, "triangle", 0.07, 0.21);
+    },
+    error: () => { playTone(220, 170, 0.12, "sawtooth", 0.05, 0); playTone(190, 150, 0.14, "sawtooth", 0.05, 0.13); }
+  };
+
+  function updateSoundBtn() {
+    document.getElementById("soundToggle").textContent = soundEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+  }
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem("nexus_sound", soundEnabled ? "on" : "off");
+    updateSoundBtn();
+    if (soundEnabled) SoundFX.click();
+  }
+  updateSoundBtn();
+
+  // Global tactile click sound on all buttons
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("button, .tool-card, .dropzone")) SoundFX.click();
+  });
+
+  // ==================== THEME ENGINE ====================
+  let currentTheme = localStorage.getItem("nexus_theme") || "dark";
+  function applyTheme() {
+    if (currentTheme === "light") {
+      document.documentElement.setAttribute("data-theme", "light");
+      document.getElementById("themeToggle").textContent = "🌙 Dark Mode";
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+      document.getElementById("themeToggle").textContent = "☀️ Light Mode";
+    }
+  }
+  function toggleTheme() {
+    currentTheme = currentTheme === "dark" ? "light" : "dark";
+    localStorage.setItem("nexus_theme", currentTheme);
+    applyTheme();
+  }
+  applyTheme();
+
+  // ==================== TOOL DEFINITIONS (16 TOOLS) ====================
+  const TOOLS = [
+    { id: "merge", name: "Merge PDF", icon: "🔗", cat: "organize", tag: "Popular", accept: ".pdf", multiple: true, desc: "Combine multiple PDFs into one unified file in your exact custom order." },
+    { id: "split", name: "Split & Extract PDF", icon: "✂️", cat: "organize", tag: "Fast", accept: ".pdf", multiple: false, desc: "Extract custom page ranges into a single PDF or split all pages into a ZIP." },
+    { id: "organize", name: "Organize & Reorder Pages", icon: "🗂️", cat: "organize", tag: "Visual", accept: ".pdf", multiple: false, desc: "Visual page grid: reorder, rotate, or delete individual pages with live previews." },
+    { id: "remove", name: "Remove Pages", icon: "🗑️", cat: "organize", tag: "Clean", accept: ".pdf", multiple: false, desc: "Delete specific pages or ranges (e.g., 1, 4-7) from any PDF cleanly." },
+    { id: "img2pdf", name: "PNG / JPG / WebP → PDF", icon: "🖼️", cat: "convert", tag: "Multi-Image", accept: "image/png,image/jpeg,image/webp", multiple: true, desc: "Convert multiple images into a high-res PDF with A4, Letter, or Fit-to-Image sizing." },
+    { id: "pdf2img", name: "PDF → PNG / JPG Images", icon: "📸", cat: "convert", tag: "HD Export", accept: ".pdf", multiple: false, desc: "Render PDF pages into crisp high-DPI PNG or JPG images packed in a ZIP." },
+    { id: "compress", name: "Compress PDF", icon: "🗜️", cat: "edit", tag: "Size Saver", accept: ".pdf", multiple: false, desc: "Shrink large PDF files with Lossless, Balanced (140 DPI), or Extreme (100 DPI) compression." },
+    { id: "rotate", name: "Rotate PDF", icon: "🔄", cat: "edit", tag: "Instant", accept: ".pdf", multiple: false, desc: "Rotate all pages or specific page ranges 90° clockwise, counter-clockwise, or 180°." },
+    { id: "watermark", name: "Watermark PDF", icon: "💧", cat: "edit", tag: "Protect", accept: ".pdf", multiple: false, desc: "Stamp diagonal or centered custom text watermarks across every page." },
+    { id: "pagenums", name: "Add Page Numbers", icon: "🔢", cat: "edit", tag: "Clean", accept: ".pdf", multiple: false, desc: "Insert clean page numbering (e.g., Page 1 of 20) at top or bottom corners." },
+    { id: "crop", name: "Crop & Trim Margins", icon: "📐", cat: "edit", tag: "Print Ready", accept: ".pdf", multiple: false, desc: "Trim wide outer margins off textbook scans before printing." },
+    { id: "stamp", name: "Add Text / Header Stamp", icon: "✍️", cat: "edit", tag: "Annotate", accept: ".pdf", multiple: false, desc: "Add custom title headers, dates, or notes onto pages." },
+    { id: "metadata", name: "PDF Metadata Editor", icon: "🏷️", cat: "edit", tag: "Inspect", accept: ".pdf", multiple: false, desc: "Inspect page dimensions and edit or wipe PDF Title, Author, and Keywords." },
+    { id: "notes2pdf", name: "Notes / Markdown → PDF", icon: "📝", cat: "bonus", tag: "Bonus #1", accept: ".md,.txt", multiple: false, noFileRequired: true, desc: "Paste or upload Markdown study notes and render a paginated A4 revision PDF." },
+    { id: "extract_text", name: "PDF Text & Keyword Finder", icon: "🔍", cat: "bonus", tag: "Bonus #2", accept: ".pdf", multiple: false, desc: "Extract selectable text, count words, search keywords, and download as .txt/.md." },
+    { id: "img_studio", name: "Batch Image Converter", icon: "🎨", cat: "bonus", tag: "Bonus #3", accept: "image/png,image/jpeg,image/webp", multiple: true, desc: "Batch convert PNG ↔ JPG ↔ WebP and resize images at custom quality." }
+  ];
+
+  let activeCat = "all";
+  let activeTool = null;
+  let uploadedFiles = [];
+  let pageItems = []; // For visual organizer
+
+  function setCategory(cat, btn) {
+    activeCat = cat;
+    document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderGrid();
+  }
+
+  function renderGrid() {
+    const q = document.getElementById("searchBox").value.trim().toLowerCase();
+    const grid = document.getElementById("toolsGrid");
+    grid.innerHTML = "";
+    TOOLS.filter(t => {
+      const catOk = activeCat === "all" || t.cat === activeCat;
+      const qOk = !q || t.name.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q);
+      return catOk && qOk;
+    }).forEach(t => {
+      const card = document.createElement("div");
+      card.className = "tool-card";
+      card.onclick = () => openTool(t.id);
+      card.innerHTML = `
+        <span class="tool-tag">${t.tag}</span>
+        <div class="tool-icon">${t.icon}</div>
+        <h3>${t.name}</h3>
+        <p>${t.desc}</p>
+      `;
+      grid.appendChild(card);
+    });
+  }
+  renderGrid();
+
+  function goHome() {
+    activeTool = null;
+    uploadedFiles = [];
+    pageItems = [];
+    document.getElementById("workspace").classList.remove("active");
+    document.getElementById("homeView").style.display = "block";
+  }
+
+  function openTool(id) {
+    activeTool = TOOLS.find(t => t.id === id);
+    uploadedFiles = [];
+    pageItems = [];
+    document.getElementById("homeView").style.display = "none";
+    document.getElementById("workspace").classList.add("active");
+    document.getElementById("wsIcon").textContent = activeTool.icon;
+    document.getElementById("wsTitle").textContent = activeTool.name;
+    document.getElementById("wsDesc").textContent = activeTool.desc;
+
+    const input = document.getElementById("fileInput");
+    input.value = "";
+    input.accept = activeTool.accept;
+    input.multiple = !!activeTool.multiple;
+
+    document.getElementById("dropTitle").textContent = activeTool.multiple
+      ? "Drag & drop multiple files here, or click to select"
+      : "Drag & drop a file here, or click to select";
+    document.getElementById("dropSub").textContent = `Accepted: ${activeTool.accept}`;
+
+    document.getElementById("fileList").innerHTML = "";
+    document.getElementById("thumbGrid").style.display = "none";
+    document.getElementById("thumbGrid").innerHTML = "";
+    document.getElementById("statusBar").textContent = "";
+    document.getElementById("resultBox").classList.remove("active");
+    document.getElementById("resultBox").innerHTML = "";
+    renderToolOptions();
+  }
+
+  // Drag & Drop handlers
+  const dz = document.getElementById("dropzone");
+  dz.addEventListener("dragover", (e) => { e.preventDefault(); dz.classList.add("dragover"); });
+  dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
+  dz.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dz.classList.remove("dragover");
+    if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+  });
+  document.getElementById("fileInput").addEventListener("change", (e) => {
+    if (e.target.files.length) handleFiles(e.target.files);
+  });
+
+  async function handleFiles(fileListObj) {
+    const incoming = Array.from(fileListObj);
+    if (!activeTool.multiple) uploadedFiles = [incoming[0]];
+    else uploadedFiles.push(...incoming);
+    SoundFX.upload();
+    renderFileList();
+
+    if (activeTool.id === "organize" && uploadedFiles[0]) {
+      await buildVisualOrganizer(uploadedFiles[0]);
+    } else if (activeTool.id === "metadata" && uploadedFiles[0]) {
+      await loadPdfMetadata(uploadedFiles[0]);
+    } else if (activeTool.id === "notes2pdf" && uploadedFiles[0]) {
+      const txt = await uploadedFiles[0].text();
+      const area = document.getElementById("opt_notes_text");
+      if (area) area.value = txt;
+    }
+  }
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+  }
+
+  function renderFileList() {
+    const list = document.getElementById("fileList");
+    list.innerHTML = "";
+    uploadedFiles.forEach((f, idx) => {
+      const row = document.createElement("div");
+      row.className = "file-item";
+      row.innerHTML = `
+        <div class="file-meta">
+          <span>📄</span>
+          <span class="file-name">${f.name}</span>
+          <span class="file-size">(${formatBytes(f.size)})</span>
+        </div>
+        <div class="file-controls">
+          ${activeTool.multiple && idx > 0 ? `<button class="mini-btn" onclick="moveFile(${idx}, -1)">↑</button>` : ""}
+          ${activeTool.multiple && idx < uploadedFiles.length - 1 ? `<button class="mini-btn" onclick="moveFile(${idx}, 1)">↓</button>` : ""}
+          <button class="mini-btn del" onclick="removeFile(${idx})">✕</button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  function moveFile(idx, dir) {
+    const target = idx + dir;
+    if (target < 0 || target >= uploadedFiles.length) return;
+    [uploadedFiles[idx], uploadedFiles[target]] = [uploadedFiles[target], uploadedFiles[idx]];
+    renderFileList();
+  }
+
+  function removeFile(idx) {
+    uploadedFiles.splice(idx, 1);
+    renderFileList();
+    if (activeTool.id === "organize") {
+      document.getElementById("thumbGrid").style.display = "none";
+      pageItems = [];
+    }
+  }
+
+  function renderToolOptions() {
+    const box = document.getElementById("toolOptions");
+    box.innerHTML = "";
+    const id = activeTool.id;
+
+    if (id === "split") {
+      box.innerHTML = `
+        <div class="field">
+          <label>Split Mode</label>
+          <select id="opt_split_mode">
+            <option value="extract">Extract Range into Single PDF</option>
+            <option value="burst">Split Every Page into ZIP</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Page Range (e.g., 1-3, 5, 8-12)</label>
+          <input type="text" id="opt_pages" placeholder="1-5" value="1-3" />
+        </div>`;
+    } else if (id === "remove") {
+      box.innerHTML = `
+        <div class="field">
+          <label>Pages to Delete (e.g., 2, 4-6)</label>
+          <input type="text" id="opt_pages" placeholder="2, 5-7" />
+        </div>`;
+    } else if (id === "img2pdf") {
+      box.innerHTML = `
+        <div class="field">
+          <label>Page Size</label>
+          <select id="opt_pagesize">
+            <option value="a4">A4 (Standard)</option>
+            <option value="letter">US Letter</option>
+            <option value="fit">Fit to Image Size</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Orientation</label>
+          <select id="opt_orient">
+            <option value="auto">Auto (Match Image)</option>
+            <option value="portrait">Portrait</option>
+            <option value="landscape">Landscape</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Margin</label>
+          <select id="opt_margin">
+            <option value="0">No Margin (Full Bleed)</option>
+            <option value="24" selected>Normal Margin</option>
+            <option value="48">Wide Margin</option>
+          </select>
+        </div>`;
+    } else if (id === "pdf2img") {
+      box.innerHTML = `
+        <div class="field">
+          <label>Image Format</label>
+          <select id="opt_imgfmt">
+            <option value="png">PNG (Lossless Sharp)</option>
+            <option value="jpeg">JPG (Compact)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Resolution Quality</label>
+          <select id="opt_scale">
+            <option value="1.5">Standard (1.5x)</option>
+            <option value="2.0" selected>High Definition (2.0x)</option>
+            <option value="3.0">Ultra HD (3.0x)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Page Range (Leave blank for all)</label>
+          <input type="text" id="opt_pages" placeholder="All pages" />
+        </div>`;
+    } else if (id === "compress") {
+      box.innerHTML = `
+        <div class="field">
+          <label>Compression Level</label>
+          <select id="opt_comp">
+            <option value="lossless">Lossless Stream Optimization</option>
+            <option value="balanced" selected>Recommended (140 DPI)</option>
+            <option value="extreme">Extreme Shrink (100 DPI)</option>
+          </select>
+        </div>`;
+    } else if (id === "rotate") {
+      box.innerHTML = `
+        <div class="field">
+          <label>Rotation Angle</label>
+          <select id="opt_angle">
+            <option value="90">90° Clockwise</option>
+            <option value="270">90° Counter-Clockwise</option>
+            <option value="180">180° Flip</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Pages (Blank = All)</label>
+          <input type="text" id="opt_pages" placeholder="All pages" />
+        </div>`;
+    } else if (id === "watermark") {
+      box.innerHTML = `
+        <div class="field">
+          <label>Watermark Text</label>
+          <input type="text" id="opt_wm_text" value="BINARY CARTEL // NEXUS VAULT" />
+        </div>
+        <div class="field">
+          <label>Opacity (0.1 to 0.8)</label>
+          <input type="number" id="opt_wm_opacity" value="0.25" min="0.05" max="0.9" step="0.05" />
+        </div>
+        <div class="field">
+          <label>Color</label>
+          <select id="opt_wm_color">
+            <option value="indigo">Indigo Blue</option>
+            <option value="red">Crimson Red</option>
+            <option value="gray">Slate Gray</option>
+          </select>
+        </div>`;
+    } else if (id === "pagenums") {
+      box.innerHTML = `
+        <div class="field">
+          <label>Position</label>
+          <select id="opt_pn_pos">
+            <option value="bottom-center">Bottom Center</option>
+            <option value="bottom-right">Bottom Right</option>
+            <option value="top-right">Top Right</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Format</label>
+          <select id="opt_pn_fmt">
+            <option value="of">Page 1 of N</option>
+            <option value="slash">1 / N</option>
+            <option value="num">1</option>
+          </select>
+        </div>`;
+    } else if (id === "crop") {
+      box.innerHTML = `
+        <div class="field"><label>Trim Top (pt)</label><input type="number" id="opt_crop_t" value="30" min="0" max="250" /></div>
+        <div class="field"><label>Trim Bottom (pt)</label><input type="number" id="opt_crop_b" value="30" min="0" max="250" /></div>
+        <div class="field"><label>Trim Left (pt)</label><input type="number" id="opt_crop_l" value="25" min="0" max="250" /></div>
+        <div class="field"><label>Trim Right (pt)</label><input type="number" id="opt_crop_r" value="25" min="0" max="250" /></div>`;
+    } else if (id === "stamp") {
+      box.innerHTML = `
+        <div class="field"><label>Stamp / Header Text</label><input type="text" id="opt_st_text" value="Class 10 Revision Notes" /></div>
+        <div class="field">
+          <label>Placement</label>
+          <select id="opt_st_pos">
+            <option value="top-left">Top Left Header</option>
+            <option value="top-right">Top Right Header</option>
+            <option value="bottom-left">Bottom Left Footer</option>
+          </select>
+        </div>`;
+    } else if (id === "metadata") {
+      box.innerHTML = `
+        <div class="field"><label>Title</label><input type="text" id="opt_md_title" placeholder="Document Title" /></div>
+        <div class="field"><label>Author</label><input type="text" id="opt_md_author" placeholder="Author Name" /></div>
+        <div class="field"><label>Subject</label><input type="text" id="opt_md_subject" placeholder="Subject / Chapter" /></div>`;
+    } else if (id === "notes2pdf") {
+      box.innerHTML = `
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Document Title</label>
+          <input type="text" id="opt_notes_title" value="Revision Sheet" />
+        </div>
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Paste Markdown or Study Notes (# Heading, ## Subheading, - Bullet)</label>
+          <textarea id="opt_notes_text" rows="9" placeholder="# Chapter 1: Chemical Reactions&#10;## Key Definitions&#10;- Oxidation: Gain of oxygen or loss of electrons.&#10;- Reduction: Loss of oxygen or gain of electrons."></textarea>
+        </div>`;
+    } else if (id === "extract_text") {
+      box.innerHTML = `
+        <div class="field">
+          <label>Optional Keyword Search</label>
+          <input type="text" id="opt_kw" placeholder="e.g., Refraction, Ohm's Law" />
+        </div>
+        <div class="field">
+          <label>Export Format</label>
+          <select id="opt_txt_fmt">
+            <option value="txt">Plain Text (.txt)</option>
+            <option value="md">Markdown (.md)</option>
+          </select>
+        </div>`;
+    } else if (id === "img_studio") {
+      box.innerHTML = `
+        <div class="field">
+          <label>Target Format</label>
+          <select id="opt_is_fmt">
+            <option value="image/webp">WebP (Smallest Size)</option>
+            <option value="image/jpeg">JPG (Universal)</option>
+            <option value="image/png">PNG (Lossless)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Resize Scale (%)</label>
+          <input type="number" id="opt_is_scale" value="100" min="10" max="200" />
+        </div>
+        <div class="field">
+          <label>Quality (0.1 to 1.0)</label>
+          <input type="number" id="opt_is_qual" value="0.85" min="0.1" max="1.0" step="0.05" />
+        </div>`;
+    }
+  }
+
+  // ==================== HELPERS ====================
+  function parsePageRange(rangeStr, totalPages) {
+    if (!rangeStr || !rangeStr.trim()) return Array.from({ length: totalPages }, (_, i) => i);
+    const indices = new Set();
+    rangeStr.split(",").forEach(part => {
+      const p = part.trim();
+      if (p.includes("-")) {
+        const [a, b] = p.split("-").map(n => parseInt(n.trim(), 10));
+        if (!isNaN(a) && !isNaN(b)) {
+          for (let i = Math.max(1, a); i <= Math.min(totalPages, b); i++) indices.add(i - 1);
+        }
+      } else {
+        const n = parseInt(p, 10);
+        if (!isNaN(n) && n >= 1 && n <= totalPages) indices.add(n - 1);
+      }
+    });
+    return Array.from(indices).sort((a, b) => a - b);
+  }
+
+  function sanitizeWinAnsi(str) {
+    return (str || "").replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g, "");
+  }
+
+  function triggerDownload(blob, filename, summaryHtml = "") {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    const resBox = document.getElementById("resultBox");
+    resBox.innerHTML = `
+      <div style="font-weight:800;font-size:1.05rem;color:var(--success);">✅ Ready: ${filename} (${formatBytes(blob.size)})</div>
+      ${summaryHtml ? `<div style="margin-top:6px;font-size:0.9rem;color:var(--text);">${summaryHtml}</div>` : ""}
+      <a class="download-btn" href="${url}" download="${filename}">⬇️ Download Again</a>
+    `;
+    resBox.classList.add("active");
+    SoundFX.success();
+  }
+
+  function setStatus(msg) {
+    document.getElementById("statusBar").textContent = msg;
+  }
+
+  // Visual Page Organizer Builder
+  async function buildVisualOrganizer(file) {
+    setStatus("⏳ Rendering page thumbnails...");
+    const bytes = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+    pageItems = [];
+    const grid = document.getElementById("thumbGrid");
+    grid.innerHTML = "";
+    grid.style.display = "grid";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const vp = page.getViewport({ scale: 0.35 });
+      const canvas = document.createElement("canvas");
+      canvas.width = vp.width;
+      canvas.height = vp.height;
+      await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
+      pageItems.push({ origIndex: i - 1, rotation: 0, canvas });
+    }
+    renderOrganizerGrid();
+    setStatus(`Loaded ${pdf.numPages} pages. Reorder, rotate, or delete pages below.`);
+  }
+
+  function renderOrganizerGrid() {
+    const grid = document.getElementById("thumbGrid");
+    grid.innerHTML = "";
+    pageItems.forEach((item, idx) => {
+      const card = document.createElement("div");
+      card.className = "thumb-card";
+      item.canvas.style.transform = `rotate(${item.rotation}deg)`;
+      const label = document.createElement("div");
+      label.style.fontSize = "0.82rem";
+      label.style.fontWeight = "700";
+      label.textContent = `Page ${idx + 1} (Orig #${item.origIndex + 1})`;
+      const acts = document.createElement("div");
+      acts.className = "thumb-actions";
+      acts.innerHTML = `
+        <button class="mini-btn" onclick="orgMove(${idx},-1)">◀</button>
+        <button class="mini-btn" onclick="orgRot(${idx})">↻</button>
+        <button class="mini-btn del" onclick="orgDel(${idx})">✕</button>
+        <button class="mini-btn" onclick="orgMove(${idx},1)">▶</button>
+      `;
+      card.appendChild(item.canvas);
+      card.appendChild(label);
+      card.appendChild(acts);
+      grid.appendChild(card);
+    });
+  }
+  function orgMove(idx, d) {
+    const t = idx + d;
+    if (t < 0 || t >= pageItems.length) return;
+    [pageItems[idx], pageItems[t]] = [pageItems[t], pageItems[idx]];
+    renderOrganizerGrid();
+  }
+  function orgRot(idx) {
+    pageItems[idx].rotation = (pageItems[idx].rotation + 90) % 360;
+    renderOrganizerGrid();
+  }
+  function orgDel(idx) {
+    if (pageItems.length <= 1) return;
+    pageItems.splice(idx, 1);
+    renderOrganizerGrid();
+  }
+
+  async function loadPdfMetadata(file) {
+    const doc = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+    document.getElementById("opt_md_title").value = doc.getTitle() || "";
+    document.getElementById("opt_md_author").value = doc.getAuthor() || "";
+    document.getElementById("opt_md_subject").value = doc.getSubject() || "";
+    setStatus(`Loaded ${doc.getPageCount()} pages.`);
+  }
+
+  // ==================== MAIN EXECUTION ENGINE ====================
+  async function executeTool() {
+    const btn = document.getElementById("runBtn");
+    btn.disabled = true;
+    document.getElementById("resultBox").classList.remove("active");
+    try {
+      const id = activeTool.id;
+      if (!activeTool.noFileRequired && uploadedFiles.length === 0) {
+        throw new Error("Please upload at least one file first!");
+      }
+
+      if (id === "merge") {
+        setStatus("⏳ Merging PDFs...");
+        const merged = await PDFDocument.create();
+        for (const f of uploadedFiles) {
+          const src = await PDFDocument.load(await f.arrayBuffer(), { ignoreEncryption: true });
+          const copied = await merged.copyPages(src, src.getPageIndices());
+          copied.forEach(p => merged.addPage(p));
+        }
+        const out = await merged.save();
+        triggerDownload(new Blob([out], { type: "application/pdf" }), "merged_nexus.pdf");
+      }
+
+      else if (id === "split") {
+        setStatus("⏳ Splitting PDF...");
+        const src = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+        const mode = document.getElementById("opt_split_mode").value;
+        if (mode === "burst") {
+          const zip = new JSZip();
+          for (let i = 0; i < src.getPageCount(); i++) {
+            const single = await PDFDocument.create();
+            const [p] = await single.copyPages(src, [i]);
+            single.addPage(p);
+            zip.file(`page_${String(i + 1).padStart(3, "0")}.pdf`, await single.save());
+          }
+          const zBlob = await zip.generateAsync({ type: "blob" });
+          triggerDownload(zBlob, "split_pages.zip", `Extracted all ${src.getPageCount()} pages into individual PDFs.`);
+        } else {
+          const indices = parsePageRange(document.getElementById("opt_pages").value, src.getPageCount());
+          if (!indices.length) throw new Error("No valid page numbers matched.");
+          const outDoc = await PDFDocument.create();
+          const copied = await outDoc.copyPages(src, indices);
+          copied.forEach(p => outDoc.addPage(p));
+          triggerDownload(new Blob([await outDoc.save()], { type: "application/pdf" }), "extracted_pages.pdf");
+        }
+      }
+
+      else if (id === "organize") {
+        setStatus("⏳ Building reorganized PDF...");
+        const src = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+        const outDoc = await PDFDocument.create();
+        for (const item of pageItems) {
+          const [p] = await outDoc.copyPages(src, [item.origIndex]);
+          if (item.rotation) p.setRotation(degrees((p.getRotation().angle + item.rotation) % 360));
+          outDoc.addPage(p);
+        }
+        triggerDownload(new Blob([await outDoc.save()], { type: "application/pdf" }), "organized.pdf");
+      }
+
+      else if (id === "remove") {
+        setStatus("⏳ Removing selected pages...");
+        const src = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+        const toDel = new Set(parsePageRange(document.getElementById("opt_pages").value, src.getPageCount()));
+        const keep = src.getPageIndices().filter(i => !toDel.has(i));
+        if (!keep.length) throw new Error("Cannot delete every page in the PDF.");
+        const outDoc = await PDFDocument.create();
+        const copied = await outDoc.copyPages(src, keep);
+        copied.forEach(p => outDoc.addPage(p));
+        triggerDownload(new Blob([await outDoc.save()], { type: "application/pdf" }), "pages_removed.pdf");
+      }
+
+      else if (id === "img2pdf") {
+        setStatus("⏳ Converting images to PDF...");
+        const doc = await PDFDocument.create();
+        const sizeMode = document.getElementById("opt_pagesize").value;
+        const orient = document.getElementById("opt_orient").value;
+        const margin = parseFloat(document.getElementById("opt_margin").value);
+
+        for (const f of uploadedFiles) {
+          const bmp = await createImageBitmap(f);
+          const canvas = document.createElement("canvas");
+          canvas.width = bmp.width;
+          canvas.height = bmp.height;
+          canvas.getContext("2d").drawImage(bmp, 0, 0);
+          const isPng = f.type === "image/png";
+          const dataUrl = canvas.toDataURL(isPng ? "image/png" : "image/jpeg", 0.92);
+          const imgBytes = await fetch(dataUrl).then(r => r.arrayBuffer());
+          const embedded = isPng ? await doc.embedPng(imgBytes) : await doc.embedJpg(imgBytes);
+
+          let pw = bmp.width + margin * 2;
+          let ph = bmp.height + margin * 2;
+          if (sizeMode !== "fit") {
+            const baseW = sizeMode === "a4" ? 595.28 : 612;
+            const baseH = sizeMode === "a4" ? 841.89 : 792;
+            const isLand = orient === "landscape" || (orient === "auto" && bmp.width > bmp.height);
+            pw = isLand ? baseH : baseW;
+            ph = isLand ? baseW : baseH;
+          }
+          const page = doc.addPage([pw, ph]);
+          const availW = Math.max(10, pw - margin * 2);
+          const availH = Math.max(10, ph - margin * 2);
+          const ratio = Math.min(availW / bmp.width, availH / bmp.height);
+          const dw = bmp.width * ratio;
+          const dh = bmp.height * ratio;
+          page.drawImage(embedded, { x: (pw - dw) / 2, y: (ph - dh) / 2, width: dw, height: dh });
+        }
+        triggerDownload(new Blob([await doc.save()], { type: "application/pdf" }), "images_bundle.pdf");
+      }
+
+      else if (id === "pdf2img") {
+        const fmt = document.getElementById("opt_imgfmt").value;
+        const scale = parseFloat(document.getElementById("opt_scale").value);
+        const bytes = await uploadedFiles[0].arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+        const indices = parsePageRange(document.getElementById("opt_pages").value, pdf.numPages);
+        const zip = new JSZip();
+
+        for (let k = 0; k < indices.length; k++) {
+          const pNum = indices[k] + 1;
+          setStatus(`⏳ Rendering page ${pNum} (${k + 1}/${indices.length})...`);
+          const page = await pdf.getPage(pNum);
+          const vp = page.getViewport({ scale });
+          const canvas = document.createElement("canvas");
+          canvas.width = vp.width;
+          canvas.height = vp.height;
+          await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
+          const blob = await new Promise(res => canvas.toBlob(res, fmt === "png" ? "image/png" : "image/jpeg", 0.92));
+          zip.file(`page_${String(pNum).padStart(3, "0")}.${fmt === "png" ? "png" : "jpg"}`, blob);
+        }
+        const zBlob = await zip.generateAsync({ type: "blob" });
+        triggerDownload(zBlob, `pdf_pages_${fmt}.zip`, `Rendered ${indices.length} high-DPI pages.`);
+      }
+
+      else if (id === "compress") {
+        const origFile = uploadedFiles[0];
+        const mode = document.getElementById("opt_comp").value;
+        const origBytes = await origFile.arrayBuffer();
+        let outBytes;
+
+        if (mode === "lossless") {
+          setStatus("⏳ Optimizing PDF object streams...");
+          const doc = await PDFDocument.load(origBytes, { ignoreEncryption: true });
+          doc.setTitle(""); doc.setSubject(""); doc.setKeywords([]);
+          outBytes = await doc.save({ useObjectStreams: true });
+        } else {
+          const scale = mode === "balanced" ? 1.4 : 1.0;
+          const qual = mode === "balanced" ? 0.72 : 0.50;
+          const pdf = await pdfjsLib.getDocument({ data: origBytes }).promise;
+          const outDoc = await PDFDocument.create();
+          for (let i = 1; i <= pdf.numPages; i++) {
+            setStatus(`⏳ Compressing page ${i}/${pdf.numPages}...`);
+            const page = await pdf.getPage(i);
+            const vp = page.getViewport({ scale });
+            const canvas = document.createElement("canvas");
+            canvas.width = vp.width;
+            canvas.height = vp.height;
+            await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
+            const jpgUrl = canvas.toDataURL("image/jpeg", qual);
+            const jpgBytes = await fetch(jpgUrl).then(r => r.arrayBuffer());
+            const img = await outDoc.embedJpg(jpgBytes);
+            const newPage = outDoc.addPage([vp.width, vp.height]);
+            newPage.drawImage(img, { x: 0, y: 0, width: vp.width, height: vp.height });
+          }
+          outBytes = await outDoc.save({ useObjectStreams: true });
+        }
+        const blob = new Blob([outBytes], { type: "application/pdf" });
+        const saved = Math.max(0, ((1 - blob.size / origFile.size) * 100)).toFixed(1);
+        triggerDownload(blob, "compressed_" + origFile.name, `${formatBytes(origFile.size)} → ${formatBytes(blob.size)} (Saved ${saved}%)`);
+      }
+
+      else if (id === "rotate") {
+        setStatus("⏳ Rotating pages...");
+        const doc = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+        const angle = parseInt(document.getElementById("opt_angle").value, 10);
+        const indices = parsePageRange(document.getElementById("opt_pages").value, doc.getPageCount());
+        indices.forEach(i => {
+          const p = doc.getPage(i);
+          p.setRotation(degrees((p.getRotation().angle + angle) % 360));
+        });
+        triggerDownload(new Blob([await doc.save()], { type: "application/pdf" }), "rotated.pdf");
+      }
+
+      else if (id === "watermark") {
+        setStatus("⏳ Applying watermark...");
+        const doc = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+        const font = await doc.embedFont(StandardFonts.HelveticaBold);
+        const text = sanitizeWinAnsi(document.getElementById("opt_wm_text").value) || "NEXUS";
+        const opacity = parseFloat(document.getElementById("opt_wm_opacity").value) || 0.25;
+        const cKey = document.getElementById("opt_wm_color").value;
+        const color = cKey === "red" ? rgb(0.85, 0.15, 0.15) : cKey === "gray" ? rgb(0.4, 0.4, 0.4) : rgb(0.35, 0.38, 0.9);
+
+        doc.getPages().forEach(p => {
+          const { width, height } = p.getSize();
+          const size = Math.max(24, Math.min(width, height) / 14);
+          p.drawText(text, {
+            x: width * 0.16,
+            y: height * 0.42,
+            size,
+            font,
+            color,
+            opacity,
+            rotate: degrees(35)
+          });
+        });
+        triggerDownload(new Blob([await doc.save()], { type: "application/pdf" }), "watermarked.pdf");
+      }
+
+      else if (id === "pagenums") {
+        setStatus("⏳ Adding page numbers...");
+        const doc = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+        const font = await doc.embedFont(StandardFonts.Helvetica);
+        const pos = document.getElementById("opt_pn_pos").value;
+        const fmt = document.getElementById("opt_pn_fmt").value;
+        const pages = doc.getPages();
+        pages.forEach((p, idx) => {
+          const { width, height } = p.getSize();
+          const label = fmt === "of" ? `Page ${idx + 1} of ${pages.length}` : fmt === "slash" ? `${idx + 1} / ${pages.length}` : `${idx + 1}`;
+          const tw = font.widthOfTextAtSize(label, 10);
+          const x = pos.includes("right") ? width - tw - 28 : (width - tw) / 2;
+          const y = pos.includes("top") ? height - 26 : 18;
+          p.drawText(label, { x, y, size: 10, font, color: rgb(0.25, 0.25, 0.25) });
+        });
+        triggerDownload(new Blob([await doc.save()], { type: "application/pdf" }), "numbered.pdf");
+      }
+
+      else if (id === "crop") {
+        setStatus("⏳ Cropping page margins...");
+        const doc = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+        const t = parseFloat(document.getElementById("opt_crop_t").value) || 0;
+        const b = parseFloat(document.getElementById("opt_crop_b").value) || 0;
+        const l = parseFloat(document.getElementById("opt_crop_l").value) || 0;
+        const r = parseFloat(document.getElementById("opt_crop_r").value) || 0;
+        doc.getPages().forEach(p => {
+          const { width, height } = p.getSize();
+          p.setCropBox(l, b, Math.max(50, width - l - r), Math.max(50, height - t - b));
+        });
+        triggerDownload(new Blob([await doc.save()], { type: "application/pdf" }), "cropped.pdf");
+      }
+
+      else if (id === "stamp") {
+        setStatus("⏳ Stamping text...");
+        const doc = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+        const font = await doc.embedFont(StandardFonts.HelveticaBold);
+        const text = sanitizeWinAnsi(document.getElementById("opt_st_text").value) || "Revision";
+        const pos = document.getElementById("opt_st_pos").value;
+        doc.getPages().forEach(p => {
+          const { width, height } = p.getSize();
+          const tw = font.widthOfTextAtSize(text, 11);
+          const x = pos === "top-right" ? width - tw - 24 : 24;
+          const y = pos.startsWith("top") ? height - 24 : 20;
+          p.drawText(text, { x, y, size: 11, font, color: rgb(0.2, 0.25, 0.75) });
+        });
+        triggerDownload(new Blob([await doc.save()], { type: "application/pdf" }), "stamped.pdf");
+      }
+
+      else if (id === "metadata") {
+        setStatus("⏳ Updating PDF metadata...");
+        const doc = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+        doc.setTitle(document.getElementById("opt_md_title").value);
+        doc.setAuthor(document.getElementById("opt_md_author").value);
+        doc.setSubject(document.getElementById("opt_md_subject").value);
+        triggerDownload(new Blob([await doc.save()], { type: "application/pdf" }), "updated_metadata.pdf");
+      }
+
+      else if (id === "notes2pdf") {
+        setStatus("⏳ Generating paginated A4 study sheet...");
+        const title = sanitizeWinAnsi(document.getElementById("opt_notes_title").value) || "Study Notes";
+        const raw = sanitizeWinAnsi(document.getElementById("opt_notes_text").value);
+        if (!raw.trim()) throw new Error("Paste or upload some study notes first!");
+
+        const doc = await PDFDocument.create();
+        const fontReg = await doc.embedFont(StandardFonts.Helvetica);
+        const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
+        let page = doc.addPage([595.28, 841.89]);
+        let y = 790;
+
+        page.drawText(title, { x: 45, y, size: 18, font: fontBold, color: rgb(0.2, 0.25, 0.8) });
+        y -= 28;
+
+        for (const rawLine of raw.split(/\r?\n/)) {
+          let line = rawLine.trim();
+          let font = fontReg;
+          let size = 11;
+          if (line.startsWith("### ")) { line = line.slice(4); font = fontBold; size = 12; y -= 4; }
+          else if (line.startsWith("## ")) { line = line.slice(3); font = fontBold; size = 14; y -= 6; }
+          else if (line.startsWith("# ")) { line = line.slice(2); font = fontBold; size = 16; y -= 8; }
+          else if (line.startsWith("- ")) { line = "• " + line.slice(2); }
+
+          const words = line.split(" ");
+          let current = "";
+          for (const w of words) {
+            const test = current ? current + " " + w : w;
+            if (font.widthOfTextAtSize(test, size) > 505) {
+              if (y < 50) { page = doc.addPage([595.28, 841.89]); y = 790; }
+              page.drawText(current, { x: 45, y, size, font, color: rgb(0.1, 0.1, 0.12) });
+              y -= size + 6;
+              current = w;
+            } else {
+              current = test;
+            }
+          }
+          if (y < 50) { page = doc.addPage([595.28, 841.89]); y = 790; }
+          if (current) page.drawText(current, { x: 45, y, size, font, color: rgb(0.1, 0.1, 0.12) });
+          y -= size + 6;
+        }
+        triggerDownload(new Blob([await doc.save()], { type: "application/pdf" }), "study_notes.pdf");
+      }
+
+      else if (id === "extract_text") {
+        const bytes = await uploadedFiles[0].arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+        const kw = document.getElementById("opt_kw").value.trim().toLowerCase();
+        const ext = document.getElementById("opt_txt_fmt").value;
+        let fullText = "";
+        let kwHits = 0;
+        let hitPages = [];
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          setStatus(`⏳ Scanning text on page ${i}/${pdf.numPages}...`);
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const pageStr = content.items.map(it => it.str).join(" ");
+          fullText += `\n--- Page ${i} ---\n${pageStr}\n`;
+          if (kw && pageStr.toLowerCase().includes(kw)) {
+            hitPages.push(i);
+            kwHits += pageStr.toLowerCase().split(kw).length - 1;
+          }
+        }
+        const words = fullText.trim().split(/\s+/).filter(Boolean).length;
+        const kwSummary = kw ? ` • Keyword "<b>${kw}</b>": <b>${kwHits}</b> hits (Pages: ${hitPages.join(", ") || "None"})` : "";
+        triggerDownload(
+          new Blob([fullText], { type: "text/plain;charset=utf-8" }),
+          `extracted_text.${ext}`,
+          `Pages: <b>${pdf.numPages}</b> • Words: <b>${words.toLocaleString()}</b>${kwSummary}`
+        );
+      }
+
+      else if (id === "img_studio") {
+        const mime = document.getElementById("opt_is_fmt").value;
+        const scale = (parseFloat(document.getElementById("opt_is_scale").value) || 100) / 100;
+        const qual = parseFloat(document.getElementById("opt_is_qual").value) || 0.85;
+        const ext = mime.split("/")[1];
+        const zip = new JSZip();
+
+        for (let i = 0; i < uploadedFiles.length; i++) {
+          setStatus(`⏳ Converting image ${i + 1}/${uploadedFiles.length}...`);
+          const bmp = await createImageBitmap(uploadedFiles[i]);
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(bmp.width * scale));
+          canvas.height = Math.max(1, Math.round(bmp.height * scale));
+          canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
+          const blob = await new Promise(res => canvas.toBlob(res, mime, qual));
+          const base = uploadedFiles[i].name.replace(/\.[^.]+$/, "");
+          if (uploadedFiles.length === 1) {
+            triggerDownload(blob, `${base}.${ext}`);
+            setStatus("Done!");
+            btn.disabled = false;
+            return;
+          }
+          zip.file(`${base}.${ext}`, blob);
+        }
+        triggerDownload(await zip.generateAsync({ type: "blob" }), `converted_images_${ext}.zip`);
+      }
+
+      setStatus("Done!");
+    } catch (err) {
+      setStatus("❌ " + err.message);
+      SoundFX.error();
+    }
+    btn.disabled = false;
+  }
+</script>
+</body>
+</html>
