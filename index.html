@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Cartel PDF Studio — 46-in-1 Offline PDF, Security & Study Suite</title>
+<link rel="manifest" href="./manifest.json" />
+<meta name="theme-color" content="#090d16" />
+<title>Cartel PDF Studio — 56-in-1 Offline PDF, Security & Study Suite</title>
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -125,9 +127,10 @@ footer { text-align: center; padding: 24px; color: var(--muted); font-size: .84r
 <header>
   <div class="brand">
     <span>⚡ <span class="grad">CARTEL</span> PDF Studio</span>
-    <span class="badge-pill">46 TOOLS • 100% OFFLINE</span>
+    <span class="badge-pill">56 TOOLS • 100% OFFLINE</span>
   </div>
   <div class="top-controls">
+    <button class="btn btn-primary" id="installPwaBtn" style="display:none;" onclick="installPWA()">📲 Install Offline App</button>
     <button class="btn" id="soundBtn" onclick="toggleSound()">🔊 Sound: ON</button>
     <button class="btn" id="themeBtn" onclick="toggleTheme()">☀️ Light Mode</button>
   </div>
@@ -138,15 +141,15 @@ footer { text-align: center; padding: 24px; color: var(--muted); font-size: .84r
   <p>100% browser-powered WebAssembly, Canvas &amp; pure-JS cryptography engine. Your PDFs, passwords, and notes never leave your device—zero uploads, zero server lag.</p>
   <div class="search-wrap">
     <span>🔍</span>
-    <input type="text" id="searchInput" placeholder="Search 46 tools (press '/' to focus) e.g. password, dark mode, OCR, merge..." oninput="renderGrid()" />
+    <input type="text" id="searchInput" placeholder="Search 56 tools (press '/' to focus) e.g. password, dark mode, OCR, merge..." oninput="renderGrid()" />
   </div>
   <div class="tabs" id="tabBar">
-    <button class="tab active" data-cat="all" onclick="setCat('all', this)">All (46)</button>
-    <button class="tab" data-cat="security" onclick="setCat('security', this)">🔐 Security &amp; Password (5)</button>
-    <button class="tab" data-cat="study" onclick="setCat('study', this)">🎓 Study &amp; Exam (12)</button>
-    <button class="tab" data-cat="organize" onclick="setCat('organize', this)">🗂️ Organize (10)</button>
-    <button class="tab" data-cat="convert" onclick="setCat('convert', this)">🔄 Converters (9)</button>
-    <button class="tab" data-cat="edit" onclick="setCat('edit', this)">✍️ Edit &amp; Annotate (10)</button>
+    <button class="tab active" data-cat="all" onclick="setCat('all', this)">All (56)</button>
+    <button class="tab" data-cat="security" onclick="setCat('security', this)">🔐 Security &amp; Password (6)</button>
+    <button class="tab" data-cat="study" onclick="setCat('study', this)">🎓 Study &amp; Exam (13)</button>
+    <button class="tab" data-cat="organize" onclick="setCat('organize', this)">🗂️ Organize (13)</button>
+    <button class="tab" data-cat="convert" onclick="setCat('convert', this)">🔄 Converters (10)</button>
+    <button class="tab" data-cat="edit" onclick="setCat('edit', this)">✍️ Edit &amp; Annotate (14)</button>
   </div>
 </section>
 
@@ -159,7 +162,7 @@ footer { text-align: center; padding: 24px; color: var(--muted); font-size: .84r
         <h2 id="wsTitle" style="font-size:1.35rem;display:flex;align-items:center;gap:8px;">📄 Tool Name</h2>
         <p id="wsDesc" style="color:var(--muted);font-size:.88rem;margin-top:4px;"></p>
       </div>
-      <button class="btn" onclick="closeTool()">⬅️ Back to All 46 Tools</button>
+      <button class="btn" onclick="closeTool()">⬅️ Back to All 56 Tools</button>
     </div>
 
     <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
@@ -659,7 +662,68 @@ Chapter 3: Work, Power & Energy | 10</textarea>
         <div class="field"><label>Table Title</label><input type="text" id="sheetTitle" value="Binary Cartel — Data Sheet"/></div>
         <div class="field"><label>Page Orientation</label><select id="sheetOrient"><option value="landscape">A4 Landscape (Wide Tables)</option><option value="portrait">A4 Portrait</option></select></div>
       </div>` },
-  { id:'extract_assets', cat:'convert', icon:'🖼️', tag:'Rip Assets', name:'Raw Embedded Figure Extractor (ZIP)', desc:'Extracts original embedded diagrams and illustrations from a PDF into a clean ZIP archive.', accept:'.pdf', multi:false }
+  { id:'extract_assets', cat:'convert', icon:'🖼️', tag:'Rip Assets', name:'Raw Embedded Figure Extractor (ZIP)', desc:'Extracts original embedded diagrams and illustrations from a PDF into a clean ZIP archive.', accept:'.pdf', multi:false },
+
+  // ==================== 10 NEW PRO TOOLS (#47 - #56) ====================
+  { id:'pipeline_builder', cat:'edit', icon:'🔗', tag:'Automation', name:'Visual Workflow & Pipeline Builder', desc:'Chain multiple steps (Rotate, Dark Mode, Grayscale, Watermark, Page Numbers, Compress, Lock) in 1 click.', accept:'.pdf', multi:true,
+    controls: () => `
+      <div class="controls-grid">
+        <div class="field"><label>1. Rotate Pages</label><select id="plRot"><option value="0">Skip Rotation</option><option value="90">Rotate 90° CW</option><option value="180">Rotate 180°</option><option value="270">Rotate 270°</option></select></div>
+        <div class="field"><label>2. Visual Filter</label><select id="plFilter"><option value="none">Keep Original Colors</option><option value="dark">AMOLED Dark Mode</option><option value="gray">Print Grayscale</option></select></div>
+        <div class="field"><label>3. Watermark Text (Optional)</label><input type="text" id="plWm" placeholder="e.g. BINARY CARTEL"/></div>
+        <div class="field"><label>4. Extra Steps</label>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:.86rem;padding-top:4px;">
+            <label><input type="checkbox" id="plNums" checked/> Stamp Page Numbers</label>
+            <label><input type="checkbox" id="plComp" checked/> Structural Compress</label>
+          </div>
+        </div>
+        <div class="field"><label>5. Final Password Lock (Optional)</label><input type="password" id="plPwd" placeholder="Leave blank for unlocked"/></div>
+      </div>` },
+  { id:'multi_search', cat:'study', icon:'🕵️', tag:'Batch Find', name:'Multi-PDF Cross-File Search Engine', desc:'Drop 20+ chapter PDFs at once and search any keyword or regex across every file and page.', accept:'.pdf', multi:true,
+    controls: () => `<div class="controls-grid"><div class="field"><label>Search Keyword or Regex *</label><input type="text" id="msQuery" placeholder="e.g. Bernoulli|SN2|Determinant"/></div></div>` },
+  { id:'chunk_zip_split', cat:'organize', icon:'📚', tag:'Chapter ZIP', name:'Smart Chapter & Chunk ZIP Splitter', desc:'Slice a large textbook into separate chapter PDFs by fixed page intervals or custom ranges in a ZIP.', accept:'.pdf', multi:false,
+    controls: () => `
+      <div class="controls-grid">
+        <div class="field"><label>Split Method</label><select id="czMode"><option value="fixed">Fixed Page Interval (Every N Pages)</option><option value="custom">Custom Chapter Ranges (One per Line)</option></select></div>
+        <div class="field"><label>Pages Per Chunk (if Fixed)</label><input type="number" id="czEvery" value="5" min="1" max="500"/></div>
+      </div>
+      <div class="field" style="margin-bottom:14px;"><label>Custom Chapters (Format: ChapterName | Start-End)</label><textarea id="czLines" rows="4">Ch01_Kinematics | 1-5
+Ch02_Dynamics | 6-12</textarea></div>` },
+  { id:'alternate_mix', cat:'organize', icon:'🔀', tag:'Interleave', name:'Alternate & Mix PDFs (Front/Back)', desc:'Interleave 2 PDFs (Page 1 of File A, Page 1 of File B...) to assemble single-sided front/back scans.', accept:'.pdf', multi:true,
+    controls: () => `<div class="controls-grid"><div class="field"><label>File 2 Page Order</label><select id="amRev"><option value="no">Normal Order (1, 2, 3...)</option><option value="yes">Reverse File 2 Order (N, N-1... for upside-down back stacks)</option></select></div></div>` },
+  { id:'overlay_underlay', cat:'edit', icon:'📄', tag:'Layer PDF', name:'PDF Overlay & Underlay Stationery', desc:'Layer File 2 (ruled lines, graph grid, or border) over or under every page of File 1.', accept:'.pdf', multi:true,
+    controls: () => `<div class="controls-grid"><div class="field"><label>Layer Placement (Upload Base PDF 1st, Stationery 2nd)</label><select id="ouMode"><option value="underlay">Underlay (Place File 2 Behind File 1)</option><option value="overlay">Overlay (Stamp File 2 On Top of File 1)</option></select></div></div>` },
+  { id:'text_whiteout', cat:'edit', icon:'🩹', tag:'Patch Text', name:'Click-to-Type Text & Whiteout Editor', desc:'Click anywhere on Page 1 to cover typos with a whiteout patch and type clean replacement text.', accept:'.pdf', multi:false, visual:'whiteout',
+    controls: () => `
+      <div class="controls-grid">
+        <div class="field"><label>Replacement Text *</label><input type="text" id="twText" value="Corrected Answer: 42"/></div>
+        <div class="field"><label>Font Size (pt)</label><input type="number" id="twSize" value="13" min="6" max="48"/></div>
+        <div class="field"><label>Text Color &amp; Patch</label><select id="twStyle"><option value="black_white">Black Text + Whiteout Box</option><option value="blue_white">Navy Text + Whiteout Box</option><option value="red_none">Crimson Text (No Whiteout Box)</option></select></div>
+      </div>` },
+  { id:'link_injector', cat:'edit', icon:'🌐', tag:'Hyperlinks', name:'Hyperlink Auditor & URL Box Injector', desc:'Audit or strip all embedded links in a PDF, or drag clickable web-link hotspots onto Page 1.', accept:'.pdf', multi:false, visual:'links',
+    controls: () => `
+      <div class="controls-grid">
+        <div class="field"><label>Link Action</label><select id="lkMode"><option value="add">Add Dragged URL Hotspots to Page 1</option><option value="strip">Strip / Remove All Existing Links in PDF</option></select></div>
+        <div class="field"><label>Target URL for New Hotspots</label><input type="text" id="lkUrl" value="https://mr-cartel.github.io/Binary-Cartel-Study/"/></div>
+      </div>` },
+  { id:'pixel_diff_wipe', cat:'organize', icon:'🎚️', tag:'Pixel Diff', name:'Pixel-Diff Wipe Slider Comparator', desc:'Compare 2 PDF versions with a draggable Before/After wipe slider and red pixel-difference highlights.', accept:'.pdf', multi:true, visual:'wipe',
+    controls: () => `
+      <div class="controls-grid">
+        <div class="field"><label>Before / After Wipe Split: <span id="wipeVal">50%</span></label><input type="range" id="wipeSlider" min="0" max="100" value="50" oninput="document.getElementById('wipeVal').textContent=this.value+'%';renderWipeCanvas()"/></div>
+        <div class="field"><label>Diff Highlight Overlay</label><select id="wipeHeat" onchange="renderWipeCanvas()"><option value="yes">Highlight Changed Pixels in Red</option><option value="no">Clean Wipe Only</option></select></div>
+      </div>` },
+  { id:'repair_pdf', cat:'security', icon:'🩺', tag:'Rescue', name:'Corrupted PDF Repair & XRef Rebuilder', desc:'Rescues damaged or truncated PDFs by rebuilding clean cross-reference tables and page streams.', accept:'.pdf', multi:false },
+  { id:'camera_scanner', cat:'convert', icon:'📸', tag:'Live Cam', name:'Live Camera Multi-Page Scanner', desc:'Capture multi-page handwritten notes from your webcam or phone camera straight into an A4 PDF.', accept:'', multi:false, noFile:true, visual:'camera',
+    controls: () => `
+      <div class="controls-grid">
+        <div class="field"><label>Scan Enhancement</label><select id="camFilter"><option value="doc">Crisp Document Contrast</option><option value="orig">Original Camera Color</option></select></div>
+        <div class="field"><label>Camera Actions</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-primary" onclick="captureCamPage()">📸 Capture Page</button>
+            <button type="button" class="btn btn-danger" onclick="clearCamPages()">🧹 Clear Scans</button>
+          </div>
+        </div>
+      </div>` }
 ];
 
 let activeCat = 'all', activeTool = null, uploadedFiles = [];
@@ -741,10 +805,31 @@ function openTool(id) {
     document.getElementById('dynamicControls').innerHTML += `<p style="font-size:.84rem;color:var(--accent);margin-bottom:6px;font-weight:700;">Live Alignment Grid Preview (Page 1):</p>
       <div class="canvas-stage"><canvas id="bgCanvas"></canvas></div>`;
   }
+  if (activeTool.visual === 'whiteout') {
+    document.getElementById('dynamicControls').innerHTML += `<p style="font-size:.84rem;color:var(--accent);margin-bottom:6px;font-weight:700;">Click anywhere on Page 1 to place a whiteout + text patch:</p>
+      <div class="canvas-stage"><canvas id="bgCanvas"></canvas><canvas id="drawCanvas"></canvas></div>`;
+  }
+  if (activeTool.visual === 'links') {
+    document.getElementById('dynamicControls').innerHTML += `<p style="font-size:.84rem;color:var(--accent);margin-bottom:6px;font-weight:700;">Drag boxes on Page 1 to create clickable URL hotspots:</p>
+      <div class="canvas-stage"><canvas id="bgCanvas"></canvas><canvas id="drawCanvas"></canvas></div>`;
+  }
+  if (activeTool.visual === 'wipe') {
+    document.getElementById('dynamicControls').innerHTML += `<p style="font-size:.84rem;color:var(--accent);margin-bottom:6px;font-weight:700;">Upload 2 PDFs to inspect Before/After Wipe &amp; Pixel Diff:</p>
+      <div class="canvas-stage"><canvas id="bgCanvas"></canvas></div>`;
+  }
+  if (activeTool.visual === 'camera') {
+    document.getElementById('dynamicControls').innerHTML += `
+      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;margin:10px 0;">
+        <video id="camVideo" autoplay playsinline style="width:100%;max-width:440px;border-radius:12px;border:1px solid var(--border);background:#000;"></video>
+        <div id="camThumbs" class="thumb-grid" style="flex:1;min-width:240px;margin:0;"></div>
+      </div>`;
+    startCameraStream();
+  }
 }
 
 function closeTool() {
   window.speechSynthesis.cancel();
+  stopCameraStream();
   document.getElementById('workspace').style.display = 'none';
   document.getElementById('heroSection').style.display = 'block';
   document.getElementById('toolGrid').style.display = 'grid';
@@ -777,6 +862,9 @@ async function handleFiles(fileListObj) {
   if (activeTool.visual === 'formbuilder') await buildFormBuilderCanvas();
   if (activeTool.visual === 'deskew') await renderDeskewPreview();
   if (activeTool.visual === 'formfill') await detectPdfFormFields();
+  if (activeTool.visual === 'whiteout') await buildWhiteoutCanvas();
+  if (activeTool.visual === 'links') await buildLinkCanvasAndAudit();
+  if (activeTool.visual === 'wipe' && uploadedFiles.length >= 2) await buildWipeDiffBuffers();
 }
 
 function renderFileList() {
@@ -1025,6 +1113,196 @@ async function renderDeskewPreview() {
   ctx.lineWidth = 1;
   for (let y = 40; y < c.height; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(c.width, y); ctx.stroke(); }
   for (let x = 40; x < c.width; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, c.height); ctx.stroke(); }
+}
+
+let whiteoutPatches = [], linkHotspots = [], wipeCanvases = null, camStream = null, camCaptures = [], deferredPwaPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPwaPrompt = e;
+  const btn = document.getElementById('installPwaBtn');
+  if (btn) btn.style.display = 'inline-flex';
+});
+
+async function installPWA() {
+  if (!deferredPwaPrompt) return;
+  deferredPwaPrompt.prompt();
+  await deferredPwaPrompt.userChoice;
+  deferredPwaPrompt = null;
+  document.getElementById('installPwaBtn').style.display = 'none';
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+
+async function buildWhiteoutCanvas() {
+  const bytes = await uploadedFiles[0].arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+  const page = await pdf.getPage(1);
+  const vp = page.getViewport({ scale: 1.0 });
+  const bg = document.getElementById('bgCanvas'), fg = document.getElementById('drawCanvas');
+  bg.width = fg.width = vp.width; bg.height = fg.height = vp.height;
+  await page.render({ canvasContext: bg.getContext('2d'), viewport: vp }).promise;
+  const ctx = fg.getContext('2d');
+  whiteoutPatches = [];
+  fg.onclick = e => {
+    const r = fg.getBoundingClientRect();
+    const x = (e.clientX - r.left) * (fg.width / r.width);
+    const y = (e.clientY - r.top) * (fg.height / r.height);
+    const text = document.getElementById('twText').value || 'Text';
+    const size = parseInt(document.getElementById('twSize').value, 10) || 13;
+    const style = document.getElementById('twStyle').value;
+    const w = Math.max(60, text.length * (size * 0.62) + 12);
+    const h = size + 10;
+    whiteoutPatches.push({ x, y, w, h, text, size, style, cw: fg.width, ch: fg.height });
+    if (style !== 'red_none') {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.strokeRect(x, y, w, h);
+    }
+    ctx.fillStyle = style === 'blue_white' ? '#1e3a8a' : style === 'red_none' ? '#dc2626' : '#0f172a';
+    ctx.font = `bold ${size}px Helvetica, Arial, sans-serif`;
+    ctx.fillText(text, x + 4, y + size);
+    playTone(760, 0.05);
+  };
+}
+
+async function buildLinkCanvasAndAudit() {
+  const bytes = await uploadedFiles[0].arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+  const foundUrls = new Set();
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const annots = await (await pdf.getPage(i)).getAnnotations();
+    annots.forEach(a => { if (a.url) foundUrls.add(`Page ${i}: ${a.url}`); });
+  }
+  const box = document.getElementById('outputBox');
+  box.style.display = 'block';
+  box.textContent = foundUrls.size
+    ? `Detected ${foundUrls.size} embedded hyperlink(s):\n` + Array.from(foundUrls).join('\n')
+    : 'No existing clickable hyperlinks detected in this PDF.';
+
+  const page1 = await pdf.getPage(1);
+  const vp = page1.getViewport({ scale: 1.0 });
+  const bg = document.getElementById('bgCanvas'), fg = document.getElementById('drawCanvas');
+  bg.width = fg.width = vp.width; bg.height = fg.height = vp.height;
+  await page1.render({ canvasContext: bg.getContext('2d'), viewport: vp }).promise;
+  const ctx = fg.getContext('2d');
+  linkHotspots = [];
+  let down = false, sx = 0, sy = 0;
+  fg.onpointerdown = e => {
+    down = true; const r = fg.getBoundingClientRect();
+    sx = (e.clientX - r.left) * (fg.width / r.width);
+    sy = (e.clientY - r.top) * (fg.height / r.height);
+  };
+  fg.onpointerup = e => {
+    if (!down) return; down = false;
+    const r = fg.getBoundingClientRect();
+    const ex = (e.clientX - r.left) * (fg.width / r.width);
+    const ey = (e.clientY - r.top) * (fg.height / r.height);
+    const url = document.getElementById('lkUrl').value.trim() || 'https://mr-cartel.github.io/Binary-Cartel-Study/';
+    const spot = { x: Math.min(sx, ex), y: Math.min(sy, ey), w: Math.max(24, Math.abs(ex - sx)), h: Math.max(16, Math.abs(ey - sy)), url, cw: fg.width, ch: fg.height };
+    linkHotspots.push(spot);
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+    ctx.strokeStyle = '#0284c7'; ctx.lineWidth = 2;
+    ctx.fillRect(spot.x, spot.y, spot.w, spot.h);
+    ctx.strokeRect(spot.x, spot.y, spot.w, spot.h);
+    playTone(780, 0.05);
+  };
+}
+
+async function buildWipeDiffBuffers() {
+  const pA = await pdfjsLib.getDocument({ data: await uploadedFiles[0].arrayBuffer() }).promise;
+  const pB = await pdfjsLib.getDocument({ data: await uploadedFiles[1].arrayBuffer() }).promise;
+  const pgA = await pA.getPage(1), pgB = await pB.getPage(1);
+  const vp = pgA.getViewport({ scale: 1.0 });
+  const cA = document.createElement('canvas'); cA.width = vp.width; cA.height = vp.height;
+  const cB = document.createElement('canvas'); cB.width = vp.width; cB.height = vp.height;
+  await pgA.render({ canvasContext: cA.getContext('2d'), viewport: vp }).promise;
+  const vpB = pgB.getViewport({ scale: vp.width / pgB.getViewport({ scale: 1.0 }).width });
+  await pgB.render({ canvasContext: cB.getContext('2d'), viewport: vpB }).promise;
+
+  const cDiff = document.createElement('canvas'); cDiff.width = vp.width; cDiff.height = vp.height;
+  const dCtx = cDiff.getContext('2d');
+  dCtx.drawImage(cB, 0, 0);
+  const dA = cA.getContext('2d').getImageData(0, 0, vp.width, vp.height).data;
+  const imgB = dCtx.getImageData(0, 0, vp.width, vp.height);
+  for (let i = 0; i < dA.length; i += 4) {
+    const diff = Math.abs(dA[i] - imgB.data[i]) + Math.abs(dA[i+1] - imgB.data[i+1]) + Math.abs(dA[i+2] - imgB.data[i+2]);
+    if (diff > 45) {
+      imgB.data[i] = 239; imgB.data[i+1] = 68; imgB.data[i+2] = 68; imgB.data[i+3] = 255;
+    }
+  }
+  dCtx.putImageData(imgB, 0, 0);
+  wipeCanvases = { cA, cB, cDiff };
+  renderWipeCanvas();
+}
+
+function renderWipeCanvas() {
+  if (!wipeCanvases) return;
+  const out = document.getElementById('bgCanvas');
+  if (!out) return;
+  const { cA, cB, cDiff } = wipeCanvases;
+  out.width = cA.width; out.height = cA.height;
+  const ctx = out.getContext('2d');
+  const pct = (parseInt(document.getElementById('wipeSlider').value, 10) || 50) / 100;
+  const showHeat = document.getElementById('wipeHeat').value === 'yes';
+  const splitX = Math.round(out.width * pct);
+  ctx.drawImage(showHeat ? cDiff : cB, 0, 0);
+  if (splitX > 0) ctx.drawImage(cA, 0, 0, splitX, out.height, 0, 0, splitX, out.height);
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillRect(splitX - 2, 0, 4, out.height);
+}
+
+async function startCameraStream() {
+  camCaptures = [];
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+    const v = document.getElementById('camVideo');
+    if (v) v.srcObject = camStream;
+  } catch (e) {
+    setStatus('⚠️ Camera permission denied or no webcam found: ' + e.message);
+  }
+}
+
+function stopCameraStream() {
+  if (camStream) {
+    camStream.getTracks().forEach(t => t.stop());
+    camStream = null;
+  }
+}
+
+function captureCamPage() {
+  const v = document.getElementById('camVideo');
+  if (!v || !v.videoWidth) { alert('Camera is not ready yet!'); return; }
+  const c = document.createElement('canvas');
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(v, 0, 0);
+  if (document.getElementById('camFilter').value === 'doc') {
+    const img = ctx.getImageData(0, 0, c.width, c.height);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const lum = img.data[i]*0.299 + img.data[i+1]*0.587 + img.data[i+2]*0.114;
+      const val = lum > 165 ? 255 : Math.max(0, lum * 0.8);
+      img.data[i] = img.data[i+1] = img.data[i+2] = val;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+  const dataUrl = c.toDataURL('image/jpeg', 0.92);
+  camCaptures.push({ dataUrl, w: c.width, h: c.height });
+  playTone(820, 0.08);
+  const grid = document.getElementById('camThumbs');
+  grid.innerHTML = camCaptures.map((item, idx) => `
+    <div class="thumb-card"><div style="font-size:.76rem;font-weight:700;margin-bottom:4px;">Scan #${idx+1}</div><img src="${item.dataUrl}" style="width:100%;border-radius:6px;"/></div>`).join('');
+  setStatus(`📸 Captured ${camCaptures.length} page(s) — click "Process & Download" when done!`);
+}
+
+function clearCamPages() {
+  camCaptures = [];
+  const grid = document.getElementById('camThumbs');
+  if (grid) grid.innerHTML = '';
+  setStatus('🧹 Cleared captured scans.');
 }
 
 /* ==================== MAIN EXECUTION DISPATCHER ==================== */
@@ -1837,6 +2115,270 @@ async function executeActiveTool() {
       const zb = await zip.generateAsync({ type: 'uint8array' });
       setStatus(`✅ Extracted ${count} embedded figure(s) into ZIP!`, b0.length, zb.length);
       downloadBlob(zb, f0.name.replace(/\.pdf$/i, '') + '_FIGURES.zip', 'application/zip');
+    }
+    else if (id === 'pipeline_builder') {
+      const rotDeg = parseInt(document.getElementById('plRot').value, 10) || 0;
+      const filt = document.getElementById('plFilter').value;
+      const wm = document.getElementById('plWm').value.trim();
+      const addNums = document.getElementById('plNums').checked;
+      const doComp = document.getElementById('plComp').checked;
+      const pwd = document.getElementById('plPwd').value;
+      const zip = uploadedFiles.length > 1 ? new JSZip() : null;
+      let singleOut = null;
+
+      for (const file of uploadedFiles) {
+        setStatus(`🔗 Running pipeline on ${file.name}...`);
+        let curBytes = new Uint8Array(await file.arrayBuffer());
+        if (filt !== 'none') {
+          const pdf = await pdfjsLib.getDocument({ data: curBytes }).promise;
+          const rDoc = await PDFDocument.create();
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const vp = (await pdf.getPage(i)).getViewport({ scale: 1.7 });
+            const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+            const ctx = c.getContext('2d');
+            await (await pdf.getPage(i)).render({ canvasContext: ctx, viewport: vp }).promise;
+            const img = ctx.getImageData(0, 0, c.width, c.height);
+            for (let k = 0; k < img.data.length; k += 4) {
+              if (filt === 'dark') {
+                img.data[k] = 255 - img.data[k]; img.data[k+1] = 255 - img.data[k+1]; img.data[k+2] = 255 - img.data[k+2];
+              } else {
+                const g = img.data[k]*0.299 + img.data[k+1]*0.587 + img.data[k+2]*0.114;
+                img.data[k] = img.data[k+1] = img.data[k+2] = g;
+              }
+            }
+            ctx.putImageData(img, 0, 0);
+            const jpg = await rDoc.embedJpg(c.toDataURL('image/jpeg', 0.88));
+            rDoc.addPage([vp.width, vp.height]).drawImage(jpg, { x: 0, y: 0, width: vp.width, height: vp.height });
+          }
+          curBytes = await rDoc.save();
+        }
+        const doc = await PDFDocument.load(curBytes, { ignoreEncryption: true });
+        const font = await doc.embedFont(StandardFonts.HelveticaBold);
+        const pages = doc.getPages();
+        pages.forEach((p, idx) => {
+          if (rotDeg) p.setRotation(degrees((p.getRotation().angle + rotDeg) % 360));
+          const { width, height } = p.getSize();
+          if (wm) p.drawText(wm, { x: width * 0.18, y: height * 0.45, size: 40, font, color: rgb(0.2, 0.5, 0.9), opacity: 0.16, rotate: degrees(35) });
+          if (addNums) p.drawText(`Page ${idx + 1} of ${pages.length}`, { x: width / 2 - 25, y: 16, size: 9, font, color: rgb(0.4, 0.4, 0.4) });
+        });
+        let outBytes = await doc.save({ useObjectStreams: doComp && !pwd });
+        if (pwd) outBytes = await PDFCrypto.encryptPDF(outBytes, pwd, pwd, -4);
+        if (zip) zip.file(file.name.replace(/\.pdf$/i, '') + '_PIPELINE.pdf', outBytes);
+        else singleOut = outBytes;
+      }
+      if (zip) {
+        const zb = await zip.generateAsync({ type: 'uint8array' });
+        setStatus(`✅ Pipeline completed on ${uploadedFiles.length} PDFs!`, 0, zb.length);
+        downloadBlob(zb, 'BinaryCartel_Pipeline_Batch.zip', 'application/zip');
+      } else {
+        setStatus('✅ Pipeline completed!', b0.length, singleOut.length);
+        downloadBlob(singleOut, f0.name.replace(/\.pdf$/i, '') + '_PIPELINE.pdf');
+      }
+    }
+    else if (id === 'multi_search') {
+      const q = document.getElementById('msQuery').value.trim();
+      if (!q) { alert('Enter a keyword or regex to search!'); return; }
+      const rx = new RegExp(q, 'gi');
+      let totalHits = 0;
+      const lines = [];
+      for (const file of uploadedFiles) {
+        setStatus(`🕵️ Searching ${file.name}...`);
+        const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+        const pageMatches = [];
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const txt = (await (await pdf.getPage(i)).getTextContent()).items.map(it => it.str).join(' ');
+          const m = txt.match(rx);
+          if (m && m.length) {
+            totalHits += m.length;
+            const idx = txt.search(rx);
+            const snippet = txt.slice(Math.max(0, idx - 30), Math.min(txt.length, idx + 60)).trim();
+            pageMatches.push(`  • Page ${i} (${m.length} hit): "...${snippet}..."`);
+          }
+        }
+        if (pageMatches.length) lines.push(`📄 ${file.name}\n` + pageMatches.join('\n'));
+      }
+      const report = totalHits
+        ? `Found ${totalHits} match(es) for "${q}" across ${uploadedFiles.length} PDF(s):\n\n` + lines.join('\n\n')
+        : `0 matches found for "${q}" across ${uploadedFiles.length} PDF(s).`;
+      const box = document.getElementById('outputBox'); box.style.display = 'block'; box.textContent = report;
+      setStatus(`✅ Cross-file search complete (${totalHits} hits)!`);
+      if (totalHits) downloadBlob(new TextEncoder().encode(report), 'CrossFile_Search_Report.txt', 'text/plain');
+    }
+    else if (id === 'chunk_zip_split') {
+      const src = await PDFDocument.load(b0, { ignoreEncryption: true });
+      const total = src.getPageCount();
+      const mode = document.getElementById('czMode').value;
+      const zip = new JSZip();
+      let parts = 0;
+      if (mode === 'fixed') {
+        const step = Math.max(1, parseInt(document.getElementById('czEvery').value, 10) || 5);
+        for (let s = 0; s < total; s += step) {
+          const end = Math.min(total, s + step);
+          const sub = await PDFDocument.create();
+          const indices = Array.from({ length: end - s }, (_, k) => s + k);
+          (await sub.copyPages(src, indices)).forEach(p => sub.addPage(p));
+          parts++;
+          zip.file(`Part_${String(parts).padStart(2,'0')}_p${s+1}-${end}.pdf`, await sub.save());
+        }
+      } else {
+        const rows = document.getElementById('czLines').value.split('\n').map(l => l.trim()).filter(Boolean);
+        for (const row of rows) {
+          const [rawName, rawRange] = row.split('|');
+          const indices = parsePageIndices((rawRange || '1').trim(), total);
+          if (!indices.length) continue;
+          const sub = await PDFDocument.create();
+          (await sub.copyPages(src, indices)).forEach(p => sub.addPage(p));
+          parts++;
+          const safeName = (rawName || `Chapter_${parts}`).trim().replace(/[^A-Za-z0-9_-]/g, '_');
+          zip.file(`${safeName}.pdf`, await sub.save());
+        }
+      }
+      const zb = await zip.generateAsync({ type: 'uint8array' });
+      setStatus(`✅ Split into ${parts} chapter PDFs inside ZIP!`, b0.length, zb.length);
+      downloadBlob(zb, f0.name.replace(/\.pdf$/i, '') + '_CHAPTERS.zip', 'application/zip');
+    }
+    else if (id === 'alternate_mix') {
+      if (uploadedFiles.length < 2) { alert('Please upload 2 PDFs (File 1 = Fronts, File 2 = Backs)!'); return; }
+      const docA = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+      const docB = await PDFDocument.load(await uploadedFiles[1].arrayBuffer(), { ignoreEncryption: true });
+      const revB = document.getElementById('amRev').value === 'yes';
+      const idxA = docA.getPageIndices();
+      const idxB = revB ? docB.getPageIndices().reverse() : docB.getPageIndices();
+      const outDoc = await PDFDocument.create();
+      const maxLen = Math.max(idxA.length, idxB.length);
+      for (let i = 0; i < maxLen; i++) {
+        if (i < idxA.length) outDoc.addPage((await outDoc.copyPages(docA, [idxA[i]]))[0]);
+        if (i < idxB.length) outDoc.addPage((await outDoc.copyPages(docB, [idxB[i]]))[0]);
+      }
+      const out = await outDoc.save();
+      setStatus(`✅ Interleaved ${outDoc.getPageCount()} pages cleanly!`, 0, out.length);
+      downloadBlob(out, 'Interleaved_FrontBack.pdf');
+    }
+    else if (id === 'overlay_underlay') {
+      if (uploadedFiles.length < 2) { alert('Upload 2 PDFs: Base PDF first, Stationery/Grid PDF second!'); return; }
+      const baseDoc = await PDFDocument.load(await uploadedFiles[0].arrayBuffer(), { ignoreEncryption: true });
+      const layerDoc = await PDFDocument.load(await uploadedFiles[1].arrayBuffer(), { ignoreEncryption: true });
+      const isUnderlay = document.getElementById('ouMode').value === 'underlay';
+      const outDoc = await PDFDocument.create();
+      const baseEmb = await outDoc.embedPages(baseDoc.getPages());
+      const layerEmb = await outDoc.embedPages(layerDoc.getPages());
+      baseEmb.forEach((bp, idx) => {
+        const lp = layerEmb[idx % layerEmb.length];
+        const page = outDoc.addPage([bp.width, bp.height]);
+        if (isUnderlay) {
+          page.drawPage(lp, { x: 0, y: 0, width: bp.width, height: bp.height });
+          page.drawPage(bp, { x: 0, y: 0, width: bp.width, height: bp.height });
+        } else {
+          page.drawPage(bp, { x: 0, y: 0, width: bp.width, height: bp.height });
+          page.drawPage(lp, { x: 0, y: 0, width: bp.width, height: bp.height });
+        }
+      });
+      const out = await outDoc.save();
+      setStatus(`✅ Applied ${isUnderlay ? 'Underlay' : 'Overlay'} across ${baseEmb.length} pages!`, b0.length, out.length);
+      downloadBlob(out, f0.name.replace(/\.pdf$/i, '') + '_LAYERED.pdf');
+    }
+    else if (id === 'text_whiteout') {
+      if (!whiteoutPatches.length) { alert('Click on the Page 1 preview above to place at least one patch!'); return; }
+      const doc = await PDFDocument.load(b0, { ignoreEncryption: true });
+      const font = await doc.embedFont(StandardFonts.HelveticaBold);
+      const p1 = doc.getPage(0);
+      const { width, height } = p1.getSize();
+      whiteoutPatches.forEach(pt => {
+        const rx = (pt.x / pt.cw) * width, rw = (pt.w / pt.cw) * width, rh = (pt.h / pt.ch) * height;
+        const ry = height - ((pt.y / pt.ch) * height) - rh;
+        if (pt.style !== 'red_none') p1.drawRectangle({ x: rx, y: ry, width: rw, height: rh, color: rgb(1, 1, 1) });
+        const col = pt.style === 'blue_white' ? rgb(0.1, 0.22, 0.55) : pt.style === 'red_none' ? rgb(0.85, 0.1, 0.1) : rgb(0.05, 0.08, 0.15);
+        const clean = pt.text.replace(/[^\x20-\x7E]/g, ' ');
+        p1.drawText(clean, { x: rx + 3, y: ry + 4, size: pt.size, font, color: col });
+      });
+      const out = await doc.save();
+      setStatus(`✅ Applied ${whiteoutPatches.length} whiteout/text patch(es)!`, b0.length, out.length);
+      downloadBlob(out, f0.name.replace(/\.pdf$/i, '') + '_PATCHED.pdf');
+    }
+    else if (id === 'link_injector') {
+      const mode = document.getElementById('lkMode').value;
+      const doc = await PDFDocument.load(b0, { ignoreEncryption: true });
+      if (mode === 'strip') {
+        doc.getPages().forEach(p => {
+          const annots = p.node.get(PDFLib.PDFName.of('Annots'));
+          if (annots instanceof PDFLib.PDFArray) {
+            const kept = [];
+            for (let i = 0; i < annots.size(); i++) {
+              const ref = annots.get(i);
+              const dict = doc.context.lookup(ref);
+              const sub = dict && dict.get ? dict.get(PDFLib.PDFName.of('Subtype')) : null;
+              if (String(sub) !== '/Link') kept.push(ref);
+            }
+            p.node.set(PDFLib.PDFName.of('Annots'), doc.context.obj(kept));
+          }
+        });
+        const out = await doc.save();
+        setStatus('✅ Stripped all clickable hyperlinks!', b0.length, out.length);
+        downloadBlob(out, f0.name.replace(/\.pdf$/i, '') + '_NOLINKS.pdf');
+      } else {
+        if (!linkHotspots.length) { alert('Drag a rectangle on Page 1 first to place a URL hotspot!'); return; }
+        const p1 = doc.getPage(0);
+        const { width, height } = p1.getSize();
+        const existingObj = p1.node.get(PDFLib.PDFName.of('Annots'));
+        const annots = existingObj instanceof PDFLib.PDFArray ? existingObj.asArray().slice() : [];
+        linkHotspots.forEach(sp => {
+          const x1 = (sp.x / sp.cw) * width, x2 = ((sp.x + sp.w) / sp.cw) * width;
+          const y2 = height - ((sp.y / sp.ch) * height), y1 = height - (((sp.y + sp.h) / sp.ch) * height);
+          const linkDict = doc.context.obj({
+            Type: 'Annot', Subtype: 'Link', Rect: [x1, y1, x2, y2],
+            Border: [0, 0, 1], C: [0.05, 0.55, 0.95],
+            A: { Type: 'Action', S: 'URI', URI: PDFLib.PDFString.of(sp.url) }
+          });
+          annots.push(doc.context.register(linkDict));
+        });
+        p1.node.set(PDFLib.PDFName.of('Annots'), doc.context.obj(annots));
+        const out = await doc.save();
+        setStatus(`✅ Added ${linkHotspots.length} clickable URL hotspot(s)!`, b0.length, out.length);
+        downloadBlob(out, f0.name.replace(/\.pdf$/i, '') + '_LINKED.pdf');
+      }
+    }
+    else if (id === 'pixel_diff_wipe') {
+      if (!wipeCanvases) { alert('Upload 2 PDFs to compare!'); return; }
+      const outDoc = await PDFDocument.create();
+      const jpg = await outDoc.embedJpg(wipeCanvases.cDiff.toDataURL('image/jpeg', 0.92));
+      outDoc.addPage([wipeCanvases.cDiff.width, wipeCanvases.cDiff.height]).drawImage(jpg, { x: 0, y: 0, width: wipeCanvases.cDiff.width, height: wipeCanvases.cDiff.height });
+      const out = await outDoc.save();
+      setStatus('✅ Exported Red Pixel-Diff Comparison PDF!', 0, out.length);
+      downloadBlob(out, 'PixelDiff_Report.pdf');
+    }
+    else if (id === 'repair_pdf') {
+      let out;
+      try {
+        const doc = await PDFDocument.load(b0, { ignoreEncryption: true, throwOnInvalidObject: false });
+        out = await doc.save({ useObjectStreams: false });
+      } catch (e) {
+        setStatus('🩺 Deep stream recovery via PDF.js fallback...');
+        const pdf = await pdfjsLib.getDocument({ data: b0 }).promise;
+        const outDoc = await PDFDocument.create();
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const vp = (await pdf.getPage(i)).getViewport({ scale: 2.0 });
+          const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+          await (await pdf.getPage(i)).render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+          const jpg = await outDoc.embedJpg(c.toDataURL('image/jpeg', 0.92));
+          outDoc.addPage([vp.width, vp.height]).drawImage(jpg, { x: 0, y: 0, width: vp.width, height: vp.height });
+        }
+        out = await outDoc.save();
+      }
+      setStatus('✅ Rebuilt XRef & Repaired PDF!', b0.length, out.length);
+      downloadBlob(out, f0.name.replace(/\.pdf$/i, '') + '_REPAIRED.pdf');
+    }
+    else if (id === 'camera_scanner') {
+      if (!camCaptures.length) { alert('Click "Capture Page" at least once first!'); return; }
+      const outDoc = await PDFDocument.create();
+      for (const cap of camCaptures) {
+        const jpg = await outDoc.embedJpg(cap.dataUrl);
+        const p = outDoc.addPage([595.28, 841.89]);
+        const s = Math.min(555 / cap.w, 801 / cap.h);
+        p.drawImage(jpg, { x: (595.28 - cap.w*s)/2, y: (841.89 - cap.h*s)/2, width: cap.w*s, height: cap.h*s });
+      }
+      const out = await outDoc.save();
+      setStatus(`✅ Compiled ${camCaptures.length} camera scan(s) into A4 PDF!`, 0, out.length);
+      downloadBlob(out, 'Cartel_Camera_Scan.pdf');
     }
   } catch (err) {
     setStatus('❌ Error: ' + err.message);
