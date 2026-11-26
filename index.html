@@ -5,13 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="manifest" href="./manifest.json" />
 <meta name="theme-color" content="#090d16" />
-<title>Cartel PDF Studio — 56-in-1 Offline PDF, Security & Study Suite</title>
-<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<meta name="referrer" content="no-referrer" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.sheetjs.com data: blob:; worker-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';" />
+<title>Cartel PDF Studio — 57-in-1 Offline PDF, Security & Study Suite</title>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
 <style>
 :root {
   --bg: #090d16; --surface: #111827; --surface-2: #1a2333; --border: #263248;
@@ -119,6 +121,22 @@ button.btn-danger { background: rgba(239,68,68,.15); border-color: rgba(239,68,6
 }
 .status-bar.show { display: flex; }
 .output-box { margin-top: 14px; padding: 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); white-space: pre-wrap; font-size: .88rem; max-height: 320px; overflow-y: auto; display: none; }
+.preset-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.preset-pill { background: var(--surface-2); color: var(--muted); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: .8rem; font-weight: 700; cursor: pointer; transition: .15s; }
+.preset-pill:hover, .preset-pill.active { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,.12); }
+.tc-progress-wrap { margin-top: 12px; padding: 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); display: none; }
+.tc-progress-wrap.show { display: block; }
+.tc-track { width: 100%; height: 10px; border-radius: 999px; background: var(--border); overflow: hidden; margin: 8px 0; }
+.tc-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--success)); transition: width .2s ease; }
+.tc-log { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .78rem; color: var(--muted); max-height: 110px; overflow-y: auto; margin-top: 6px; }
+.tc-warn { margin-top: 10px; padding: 10px 14px; border-radius: 10px; font-size: .86rem; font-weight: 600; display: none; }
+.tc-warn.show { display: block; }
+.tc-warn.amber { background: rgba(245,158,11,.14); border: 1px solid rgba(245,158,11,.4); color: var(--warn); }
+.tc-warn.green { background: rgba(16,185,129,.14); border: 1px solid rgba(16,185,129,.4); color: var(--success); }
+.tc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+.tc-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.tc-stat small { display: block; color: var(--muted); font-size: .74rem; text-transform: uppercase; font-weight: 700; }
+.tc-stat strong { font-size: 1.08rem; }
 footer { text-align: center; padding: 24px; color: var(--muted); font-size: .84rem; border-top: 1px solid var(--border); }
 </style>
 </head>
@@ -127,7 +145,7 @@ footer { text-align: center; padding: 24px; color: var(--muted); font-size: .84r
 <header>
   <div class="brand">
     <span>⚡ <span class="grad">CARTEL</span> PDF Studio</span>
-    <span class="badge-pill">56 TOOLS • 100% OFFLINE</span>
+    <span class="badge-pill">57 TOOLS • 100% OFFLINE</span>
   </div>
   <div class="top-controls">
     <button class="btn btn-primary" id="installPwaBtn" style="display:none;" onclick="installPWA()">📲 Install Offline App</button>
@@ -141,15 +159,15 @@ footer { text-align: center; padding: 24px; color: var(--muted); font-size: .84r
   <p>100% browser-powered WebAssembly, Canvas &amp; pure-JS cryptography engine. Your PDFs, passwords, and notes never leave your device—zero uploads, zero server lag.</p>
   <div class="search-wrap">
     <span>🔍</span>
-    <input type="text" id="searchInput" placeholder="Search 56 tools (press '/' to focus) e.g. password, dark mode, OCR, merge..." oninput="renderGrid()" />
+    <input type="text" id="searchInput" placeholder="Search 57 tools (press '/' to focus) e.g. target size, password, dark mode, OCR..." oninput="renderGrid()" />
   </div>
   <div class="tabs" id="tabBar">
-    <button class="tab active" data-cat="all" onclick="setCat('all', this)">All (56)</button>
+    <button class="tab active" data-cat="all" onclick="setCat('all', this)">All (57)</button>
     <button class="tab" data-cat="security" onclick="setCat('security', this)">🔐 Security &amp; Password (6)</button>
     <button class="tab" data-cat="study" onclick="setCat('study', this)">🎓 Study &amp; Exam (13)</button>
     <button class="tab" data-cat="organize" onclick="setCat('organize', this)">🗂️ Organize (13)</button>
     <button class="tab" data-cat="convert" onclick="setCat('convert', this)">🔄 Converters (10)</button>
-    <button class="tab" data-cat="edit" onclick="setCat('edit', this)">✍️ Edit &amp; Annotate (14)</button>
+    <button class="tab" data-cat="edit" onclick="setCat('edit', this)">✍️ Edit &amp; Annotate (15)</button>
   </div>
 </section>
 
@@ -162,7 +180,7 @@ footer { text-align: center; padding: 24px; color: var(--muted); font-size: .84r
         <h2 id="wsTitle" style="font-size:1.35rem;display:flex;align-items:center;gap:8px;">📄 Tool Name</h2>
         <p id="wsDesc" style="color:var(--muted);font-size:.88rem;margin-top:4px;"></p>
       </div>
-      <button class="btn" onclick="closeTool()">⬅️ Back to All 56 Tools</button>
+      <button class="btn" onclick="closeTool()">⬅️ Back to All 57 Tools</button>
     </div>
 
     <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
@@ -189,12 +207,42 @@ footer { text-align: center; padding: 24px; color: var(--muted); font-size: .84r
 </section>
 
 <footer>
-  ⚡ Cartel PDF Studio • 36 Client-Side Tools • Zero Server Load • Built for Binary Cartel
+  ⚡ Cartel PDF Studio • 57 Client-Side Tools • Zero Server Load • Built for Binary Cartel
 </footer>
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 const { PDFDocument, rgb, degrees, StandardFonts } = PDFLib;
+
+/* ==================== SECURITY & SAFETY HELPERS ==================== */
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function isSafeExternalUrl(url) {
+  return /^(https?:|mailto:)/i.test(String(url || '').trim());
+}
+function buildSafeRegex(pattern) {
+  if (!pattern || pattern.length > 200) throw new Error('Search pattern must be 1–200 characters.');
+  try {
+    return new RegExp(pattern, 'gi');
+  } catch (e) {
+    const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(escaped, 'gi');
+  }
+}
+function formatBytesHuman(bytes) {
+  if (!Number.isFinite(bytes) || bytes < 0) return '0 B';
+  if (bytes < 1024) return bytes + ' B';
+  const kb = bytes / 1024;
+  return kb < 1024 ? kb.toFixed(1) + ' KB' : (kb / 1024).toFixed(2) + ' MB';
+}
+let targetCompressCancel = false;
+let targetCompressUrl = null;
 
 /* ==================== SOUND & THEME ENGINE ==================== */
 let soundEnabled = true;
@@ -588,6 +636,40 @@ const TOOLS = [
   // EDIT & ANNOTATE (7)
   { id:'compress', cat:'edit', icon:'🗜️', tag:'Size Saver', name:'Compress & Optimize PDF', desc:'Rebuilds PDF structure and downsamples heavy pages with live before/after size savings.', accept:'.pdf', multi:false,
     controls: () => `<div class="controls-grid"><div class="field"><label>Compression Level</label><select id="compLevel"><option value="structural">Lossless Structural Rebuild (Fastest)</option><option value="raster">Deep Visual Compression (Smallest File)</option></select></div></div>` },
+  { id:'target_compress', cat:'edit', icon:'🎯', tag:'Target Size', name:'Compress PDF to Target Size', desc:'Hits an exact KB/MB upload limit using binary search over JPEG quality & adaptive DPI—never exceeding your target.', accept:'.pdf', multi:false,
+    controls: () => `
+      <div class="controls-grid">
+        <div class="field"><label>Target Max Size</label><input type="number" id="tcTargetVal" value="500" min="10" step="any" oninput="syncTcPresets();checkTcPrewarn()"/></div>
+        <div class="field"><label>Unit</label><select id="tcTargetUnit" onchange="syncTcPresets();checkTcPrewarn()"><option value="KB" selected>KB (Kilobytes)</option><option value="MB">MB (Megabytes)</option></select></div>
+      </div>
+      <div class="preset-row" id="tcPresets">
+        <span style="font-size:.8rem;color:var(--muted);font-weight:700;">Quick Presets:</span>
+        <button type="button" class="preset-pill" data-v="200" data-u="KB" onclick="setTcPreset(200,'KB')">200 KB</button>
+        <button type="button" class="preset-pill active" data-v="500" data-u="KB" onclick="setTcPreset(500,'KB')">500 KB</button>
+        <button type="button" class="preset-pill" data-v="1" data-u="MB" onclick="setTcPreset(1,'MB')">1 MB</button>
+        <button type="button" class="preset-pill" data-v="2" data-u="MB" onclick="setTcPreset(2,'MB')">2 MB</button>
+        <button type="button" class="btn btn-danger" id="tcCancelBtn" style="display:none;padding:5px 10px;font-size:.78rem;" onclick="targetCompressCancel=true">✖ Cancel</button>
+      </div>
+      <div class="tc-warn" id="tcWarnBox"></div>
+      <div class="tc-progress-wrap" id="tcProgressWrap">
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;">
+          <span id="tcStage">Ready</span>
+          <span id="tcPct" style="color:var(--accent);">0%</span>
+        </div>
+        <div class="tc-track"><div class="tc-fill" id="tcBar"></div></div>
+        <div class="tc-log" id="tcLog"></div>
+      </div>
+      <div id="tcResultBox" style="display:none;">
+        <div class="tc-stats">
+          <div class="tc-stat"><small>Original Size</small><strong id="tcOrigStat">—</strong></div>
+          <div class="tc-stat"><small>Compressed Size</small><strong id="tcNewStat" style="color:var(--success);">—</strong></div>
+          <div class="tc-stat"><small>Saved</small><strong id="tcSaveStat" style="color:var(--accent);">—</strong></div>
+        </div>
+        <p id="tcMetaStat" style="font-size:.82rem;color:var(--muted);margin-top:8px;"></p>
+        <div style="margin-top:10px;">
+          <a id="tcDownloadBtn" class="btn btn-primary" href="#" download="compressed.pdf" style="text-decoration:none;">⬇️ Download Compressed PDF</a>
+        </div>
+      </div>` },
   { id:'crop', cat:'edit', icon:'✂️', tag:'Full-Screen', name:'Bulk Margin Cropper & Auto-Trim', desc:'Trims outer white borders across all pages so PDFs fill phone and tablet screens cleanly.', accept:'.pdf', multi:false,
     controls: () => `<div class="controls-grid"><div class="field"><label>Trim Border Percentage (%)</label><input type="number" id="cropPct" value="6" min="1" max="25"/></div></div>` },
   { id:'watermark', cat:'edit', icon:'🛡️', tag:'Branding', name:'Custom Diagonal Watermark Designer', desc:'Stamps custom diagonal branding text across every page with adjustable opacity.', accept:'.pdf', multi:false,
@@ -868,11 +950,31 @@ async function handleFiles(fileListObj) {
 }
 
 function renderFileList() {
-  document.getElementById('fileList').innerHTML = uploadedFiles.map((f, idx) => `
-    <div class="file-item">
-      <span>📄 <strong>${f.name}</strong> <span style="color:var(--muted);">(${(f.size/1024).toFixed(1)} KB)</span></span>
-      <button class="btn btn-danger" style="padding:4px 8px;font-size:.78rem;" onclick="uploadedFiles.splice(${idx},1);renderFileList()">✕</button>
-    </div>`).join('');
+  const list = document.getElementById('fileList');
+  list.innerHTML = '';
+  uploadedFiles.forEach((f, idx) => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    const info = document.createElement('span');
+    info.appendChild(document.createTextNode('📄 '));
+    const strong = document.createElement('strong');
+    strong.textContent = f.name;
+    info.appendChild(strong);
+    const sz = document.createElement('span');
+    sz.style.color = 'var(--muted)';
+    sz.textContent = ` (${formatBytesHuman(f.size)})`;
+    info.appendChild(sz);
+    const rmBtn = document.createElement('button');
+    rmBtn.type = 'button';
+    rmBtn.className = 'btn btn-danger';
+    rmBtn.style.cssText = 'padding:4px 8px;font-size:.78rem;';
+    rmBtn.textContent = '✕';
+    rmBtn.addEventListener('click', () => { uploadedFiles.splice(idx, 1); renderFileList(); if (activeTool && activeTool.id === 'target_compress') checkTcPrewarn(); });
+    item.appendChild(info);
+    item.appendChild(rmBtn);
+    list.appendChild(item);
+  });
+  if (activeTool && activeTool.id === 'target_compress') checkTcPrewarn();
 }
 
 function setStatus(msg, origBytes = 0, newBytes = 0) {
@@ -893,10 +995,12 @@ function setStatus(msg, origBytes = 0, newBytes = 0) {
 
 function downloadBlob(bytes, filename, mime = 'application/pdf') {
   const blob = new Blob([bytes], { type: mime });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  a.href = url;
   a.download = filename;
   a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
   playTone(880, 0.12);
 }
 
@@ -964,7 +1068,10 @@ async function buildComparator() {
     const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
     await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
     const box = document.createElement('div'); box.className = 'thumb-card';
-    box.innerHTML = `<div style="font-weight:700;margin-bottom:6px;">File ${fIdx+1}: ${uploadedFiles[fIdx].name} (${pdf.numPages} pages)</div>`;
+    const titleDiv = document.createElement('div');
+    titleDiv.style.cssText = 'font-weight:700;margin-bottom:6px;';
+    titleDiv.textContent = `File ${fIdx+1}: ${uploadedFiles[fIdx].name} (${pdf.numPages} pages)`;
+    box.appendChild(titleDiv);
     box.appendChild(c); grid.appendChild(box);
   }
 }
@@ -1063,26 +1170,44 @@ async function detectPdfFormFields() {
     wrap.innerHTML = `<p style="color:var(--warn);font-weight:700;">⚠️ No interactive AcroForm fields found in this PDF. Use "Interactive Fillable Form Builder" first!</p>`;
     return;
   }
-  let html = `<div class="controls-grid">`;
+  wrap.innerHTML = '';
+  const gridEl = document.createElement('div');
+  gridEl.className = 'controls-grid';
   fields.forEach((f, idx) => {
     const name = f.getName();
     const ctor = f.constructor.name;
     detectedFormMeta.push({ name, ctor });
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = 'field';
+    const lbl = document.createElement('label');
     if (ctor.includes('CheckBox')) {
-      const checked = f.isChecked() ? 'checked' : '';
-      html += `<div class="field"><label>${name} (Checkbox)</label><input type="checkbox" id="ff_${idx}" ${checked} style="width:22px;height:22px;"/></div>`;
+      lbl.textContent = `${name} (Checkbox)`;
+      const cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.id = `ff_${idx}`; cb.checked = f.isChecked();
+      cb.style.cssText = 'width:22px;height:22px;';
+      fieldDiv.append(lbl, cb);
     } else if (ctor.includes('Dropdown')) {
-      const opts = f.getOptions();
-      const sel = f.getSelected()[0] || '';
-      html += `<div class="field"><label>${name}</label><select id="ff_${idx}">${opts.map(o => `<option value="${o}" ${o===sel?'selected':''}>${o}</option>`).join('')}</select></div>`;
+      lbl.textContent = name;
+      const selEl = document.createElement('select');
+      selEl.id = `ff_${idx}`;
+      const curSel = f.getSelected()[0] || '';
+      f.getOptions().forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o; opt.textContent = o;
+        if (o === curSel) opt.selected = true;
+        selEl.appendChild(opt);
+      });
+      fieldDiv.append(lbl, selEl);
     } else {
-      let val = '';
-      try { val = f.getText() || ''; } catch(e) {}
-      html += `<div class="field"><label>${name}</label><input type="text" id="ff_${idx}" value="${val.replace(/"/g, '&quot;')}"/></div>`;
+      lbl.textContent = name;
+      const inp = document.createElement('input');
+      inp.type = 'text'; inp.id = `ff_${idx}`;
+      try { inp.value = f.getText() || ''; } catch(e) { inp.value = ''; }
+      fieldDiv.append(lbl, inp);
     }
+    gridEl.appendChild(fieldDiv);
   });
-  html += `</div>`;
-  wrap.innerHTML = html;
+  wrap.appendChild(gridEl);
 }
 
 async function renderDeskewPreview() {
@@ -1201,7 +1326,9 @@ async function buildLinkCanvasAndAudit() {
     const r = fg.getBoundingClientRect();
     const ex = (e.clientX - r.left) * (fg.width / r.width);
     const ey = (e.clientY - r.top) * (fg.height / r.height);
-    const url = document.getElementById('lkUrl').value.trim() || 'https://mr-cartel.github.io/Binary-Cartel-Study/';
+    const rawUrl = document.getElementById('lkUrl').value.trim() || 'https://mr-cartel.github.io/Binary-Cartel-Study/';
+    if (!isSafeExternalUrl(rawUrl)) { setStatus('⚠️ Only http://, https://, or mailto: links are allowed.'); return; }
+    const url = rawUrl;
     const spot = { x: Math.min(sx, ex), y: Math.min(sy, ey), w: Math.max(24, Math.abs(ex - sx)), h: Math.max(16, Math.abs(ey - sy)), url, cw: fg.width, ch: fg.height };
     linkHotspots.push(spot);
     ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
@@ -1303,6 +1430,94 @@ function clearCamPages() {
   const grid = document.getElementById('camThumbs');
   if (grid) grid.innerHTML = '';
   setStatus('🧹 Cleared captured scans.');
+}
+
+
+/* ==================== TOOL #57: TARGET-SIZE COMPRESSOR HELPERS ==================== */
+function getTcTargetBytes() {
+  const valEl = document.getElementById('tcTargetVal');
+  const unitEl = document.getElementById('tcTargetUnit');
+  if (!valEl || !unitEl) return 0;
+  const v = parseFloat(valEl.value);
+  if (!Number.isFinite(v) || v <= 0) return 0;
+  return unitEl.value === 'MB' ? Math.round(v * 1024 * 1024) : Math.round(v * 1024);
+}
+function setTcPreset(val, unit) {
+  document.getElementById('tcTargetVal').value = val;
+  document.getElementById('tcTargetUnit').value = unit;
+  syncTcPresets();
+  checkTcPrewarn();
+  playTone(620, 0.05);
+}
+function syncTcPresets() {
+  const valEl = document.getElementById('tcTargetVal');
+  const unitEl = document.getElementById('tcTargetUnit');
+  if (!valEl || !unitEl) return;
+  const v = parseFloat(valEl.value), u = unitEl.value;
+  document.querySelectorAll('#tcPresets .preset-pill').forEach(btn => {
+    const match = btn.dataset.u === u && Math.abs(parseFloat(btn.dataset.v) - v) < 0.0001;
+    btn.classList.toggle('active', match);
+  });
+}
+function showTcWarn(cls, msg) {
+  const box = document.getElementById('tcWarnBox');
+  if (!box) return;
+  box.className = 'tc-warn show ' + cls;
+  box.textContent = msg;
+}
+function checkTcPrewarn() {
+  const box = document.getElementById('tcWarnBox');
+  if (!box) return;
+  if (!uploadedFiles.length) { box.className = 'tc-warn'; return; }
+  const targetBytes = getTcTargetBytes();
+  const origBytes = uploadedFiles[0].size;
+  if (targetBytes <= 0) {
+    showTcWarn('amber', '⚠️ Please enter a target size greater than 0.');
+  } else if (origBytes <= targetBytes) {
+    showTcWarn('amber', `ℹ️ Already under target: Original PDF is ${formatBytesHuman(origBytes)}, which is already smaller than ${formatBytesHuman(targetBytes)}.`);
+  } else if (origBytes > 100 * 1024 * 1024) {
+    showTcWarn('amber', '⚠️ Large file (>100 MB): Processing in browser RAM may take extra time.');
+  } else {
+    box.className = 'tc-warn';
+  }
+}
+function setTcProgress(pct, stage, logLine) {
+  const wrap = document.getElementById('tcProgressWrap');
+  if (wrap) wrap.classList.add('show');
+  const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+  const bar = document.getElementById('tcBar');
+  const pctEl = document.getElementById('tcPct');
+  const stgEl = document.getElementById('tcStage');
+  const logEl = document.getElementById('tcLog');
+  if (bar) bar.style.width = clamped + '%';
+  if (pctEl) pctEl.textContent = clamped + '%';
+  if (stgEl && stage) stgEl.textContent = stage;
+  if (logEl && logLine) {
+    const line = document.createElement('div');
+    line.textContent = '› ' + logLine;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+}
+function tcCanvasToJpeg(canvas, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (!blob) return reject(new Error('JPEG encoding failed'));
+      blob.arrayBuffer().then(buf => resolve(new Uint8Array(buf))).catch(reject);
+    }, 'image/jpeg', quality);
+  });
+}
+async function tcAssemblePdf(renderedPages, quality) {
+  const outPdf = await PDFDocument.create();
+  for (let i = 0; i < renderedPages.length; i++) {
+    if (targetCompressCancel) throw new Error('CANCELLED');
+    const item = renderedPages[i];
+    const jpgBytes = await tcCanvasToJpeg(item.canvas, quality);
+    const jpgImg = await outPdf.embedJpg(jpgBytes);
+    const pg = outPdf.addPage([item.pdfW, item.pdfH]);
+    pg.drawImage(jpgImg, { x: 0, y: 0, width: item.pdfW, height: item.pdfH });
+  }
+  return await outPdf.save({ useObjectStreams: true });
 }
 
 /* ==================== MAIN EXECUTION DISPATCHER ==================== */
@@ -1752,6 +1967,144 @@ async function executeActiveTool() {
       setStatus('✅ Compression Complete!', b0.length, out.length);
       downloadBlob(out, f0.name.replace(/\.pdf$/i, '') + '_COMPRESSED.pdf');
     }
+    else if (id === 'target_compress') {
+      const targetBytes = getTcTargetBytes();
+      if (targetBytes <= 0) { setStatus('⚠️ Enter a valid target size greater than 0.'); return; }
+      const origBytes = b0.length;
+      const cancelBtn = document.getElementById('tcCancelBtn');
+      const resBox = document.getElementById('tcResultBox');
+      const logEl = document.getElementById('tcLog');
+      if (logEl) logEl.innerHTML = '';
+      if (resBox) resBox.style.display = 'none';
+      if (targetCompressUrl) { URL.revokeObjectURL(targetCompressUrl); targetCompressUrl = null; }
+
+      const showFinalTc = (outBytes, methodLabel, hitTarget, warnMsg) => {
+        const outSize = outBytes.length;
+        const saved = Math.max(0, origBytes - outSize);
+        const pct = origBytes > 0 ? ((saved / origBytes) * 100).toFixed(1) : '0.0';
+        document.getElementById('tcOrigStat').textContent = formatBytesHuman(origBytes);
+        document.getElementById('tcNewStat').textContent = formatBytesHuman(outSize);
+        document.getElementById('tcSaveStat').textContent = saved > 0 ? `-${pct}% (${formatBytesHuman(saved)})` : '0% (unchanged)';
+        document.getElementById('tcMetaStat').textContent = `Method: ${methodLabel}`;
+        const blob = new Blob([outBytes], { type: 'application/pdf' });
+        targetCompressUrl = URL.createObjectURL(blob);
+        const dlBtn = document.getElementById('tcDownloadBtn');
+        const outName = f0.name.replace(/\.pdf$/i, '') + `_TARGET_${document.getElementById('tcTargetVal').value}${document.getElementById('tcTargetUnit').value}.pdf`;
+        dlBtn.href = targetCompressUrl;
+        dlBtn.download = outName;
+        resBox.style.display = 'block';
+        if (warnMsg) showTcWarn(hitTarget ? 'green' : 'amber', warnMsg);
+        setStatus(hitTarget ? `✅ Compressed under ${formatBytesHuman(targetBytes)} target!` : `⚠️ Reached minimum size (${formatBytesHuman(outSize)}).`, origBytes, outSize);
+        playTone(hitTarget ? 880 : 420, 0.12);
+      };
+
+      if (origBytes <= targetBytes) {
+        showFinalTc(b0, 'Original kept (already under target)', true, `ℹ️ Original PDF (${formatBytesHuman(origBytes)}) is already smaller than ${formatBytesHuman(targetBytes)}.`);
+        return;
+      }
+
+      targetCompressCancel = false;
+      if (cancelBtn) cancelBtn.style.display = 'inline-flex';
+      let pdfJsDoc = null;
+      try {
+        setTcProgress(5, 'Checking lossless object-stream optimization...', `Target: ${formatBytesHuman(targetBytes)} | Original: ${formatBytesHuman(origBytes)}`);
+        try {
+          const srcDoc = await PDFDocument.load(b0, { ignoreEncryption: true });
+          const lossless = await srcDoc.save({ useObjectStreams: true });
+          setTcProgress(12, 'Lossless pass checked', `Lossless rebuild: ${formatBytesHuman(lossless.length)}`);
+          if (lossless.length <= targetBytes) {
+            setTcProgress(100, 'Reached target losslessly!');
+            showFinalTc(lossless, 'Lossless object-stream optimization', true, `✅ Reached ${formatBytesHuman(lossless.length)} with zero quality loss.`);
+            return;
+          }
+        } catch (_) {}
+
+        pdfJsDoc = await pdfjsLib.getDocument({ data: b0.slice() }).promise;
+        const targetPerPageKB = targetBytes / 1024 / Math.max(1, pdfJsDoc.numPages);
+        let scaleTiers = [1.5, 1.2, 0.95, 0.75, 0.58, 0.42];
+        if (targetPerPageKB < 25) scaleTiers = [0.95, 0.75, 0.58, 0.42, 0.32];
+        else if (targetPerPageKB < 60) scaleTiers = [1.2, 0.95, 0.75, 0.58, 0.42];
+
+        const MIN_Q = 0.14, MAX_Q = 0.92, STEPS = 6;
+        let bestFit = null, smallest = null;
+        const tierSpan = 84 / scaleTiers.length;
+
+        for (let t = 0; t < scaleTiers.length; t++) {
+          if (targetCompressCancel) throw new Error('CANCELLED');
+          const scale = scaleTiers[t];
+          const dpi = Math.round(scale * 72);
+          const basePct = 14 + t * tierSpan;
+          const rendered = [];
+
+          for (let i = 1; i <= pdfJsDoc.numPages; i++) {
+            if (targetCompressCancel) throw new Error('CANCELLED');
+            const page = await pdfJsDoc.getPage(i);
+            const vp1 = page.getViewport({ scale: 1.0 });
+            // Cap max pixel dimension to prevent PDF-bomb RAM exhaustion
+            const safeScale = Math.min(scale, 2800 / Math.max(vp1.width, vp1.height, 1));
+            const vp = page.getViewport({ scale: safeScale });
+            const c = document.createElement('canvas');
+            c.width = Math.max(1, Math.round(vp.width));
+            c.height = Math.max(1, Math.round(vp.height));
+            const ctx = c.getContext('2d', { alpha: false });
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+            await page.render({ canvasContext: ctx, viewport: vp }).promise;
+            rendered.push({ canvas: c, pdfW: vp1.width, pdfH: vp1.height });
+            setTcProgress(basePct + (i / pdfJsDoc.numPages) * (tierSpan * 0.45), `Rendering at ${dpi} DPI (${i}/${pdfJsDoc.numPages})...`);
+          }
+
+          const maxB = await tcAssemblePdf(rendered, MAX_Q);
+          setTcProgress(basePct + tierSpan * 0.55, `Probed ${dpi} DPI @ 92%`, `${dpi} DPI @ q=92% → ${formatBytesHuman(maxB.length)}`);
+          if (!smallest || maxB.length < smallest.bytes.length) smallest = { bytes: maxB, scale, q: MAX_Q };
+          if (maxB.length <= targetBytes) { bestFit = { bytes: maxB, scale, q: MAX_Q }; break; }
+
+          const minB = await tcAssemblePdf(rendered, MIN_Q);
+          setTcProgress(basePct + tierSpan * 0.68, `Probed ${dpi} DPI @ 14%`, `${dpi} DPI @ q=14% → ${formatBytesHuman(minB.length)}`);
+          if (!smallest || minB.length < smallest.bytes.length) smallest = { bytes: minB, scale, q: MIN_Q };
+          if (minB.length > targetBytes) {
+            setTcProgress(basePct + tierSpan * 0.95, `${dpi} DPI above target, lowering DPI...`, `${dpi} DPI floor (${formatBytesHuman(minB.length)}) > target`);
+            continue;
+          }
+
+          bestFit = { bytes: minB, scale, q: MIN_Q };
+          let lo = MIN_Q, hi = MAX_Q;
+          for (let s = 1; s <= STEPS; s++) {
+            if (targetCompressCancel) throw new Error('CANCELLED');
+            const mid = (lo + hi) / 2;
+            const trial = await tcAssemblePdf(rendered, mid);
+            const fits = trial.length <= targetBytes;
+            setTcProgress(basePct + tierSpan * (0.7 + (s / STEPS) * 0.28), `Binary search ${s}/${STEPS} (${dpi} DPI, q=${Math.round(mid*100)}%)`, `Pass ${s}: ${dpi} DPI @ q=${Math.round(mid*100)}% → ${formatBytesHuman(trial.length)} ${fits ? '✓' : '✗'}`);
+            if (fits) {
+              bestFit = { bytes: trial, scale, q: mid };
+              lo = mid;
+              if (trial.length >= targetBytes * 0.975) break;
+            } else {
+              hi = mid;
+            }
+          }
+          break;
+        }
+
+        setTcProgress(100, 'Compression complete!');
+        if (bestFit) {
+          showFinalTc(bestFit.bytes, `Adaptive ${Math.round(bestFit.scale*72)} DPI • JPEG ${Math.round(bestFit.q*100)}% (binary search)`, true, `✅ Compressed to ${formatBytesHuman(bestFit.bytes.length)} — safely under your ${formatBytesHuman(targetBytes)} limit.`);
+        } else if (smallest) {
+          const useOrig = smallest.bytes.length >= origBytes;
+          showFinalTc(useOrig ? b0 : smallest.bytes, useOrig ? 'Original kept (smallest possible)' : `Min floor: ${Math.round(smallest.scale*72)} DPI • JPEG ${Math.round(smallest.q*100)}%`, false, `⚠️ Target too extreme: Closest achievable size is ${formatBytesHuman(useOrig ? origBytes : smallest.bytes.length)}, above ${formatBytesHuman(targetBytes)}.`);
+        }
+      } catch (tcErr) {
+        if (tcErr && tcErr.message === 'CANCELLED') {
+          setTcProgress(0, 'Cancelled');
+          showTcWarn('amber', '⏹️ Compression cancelled.');
+          setStatus('⏹️ Compression cancelled.');
+        } else {
+          throw tcErr;
+        }
+      } finally {
+        if (pdfJsDoc) { try { await pdfJsDoc.destroy(); } catch(_) {} }
+        if (cancelBtn) cancelBtn.style.display = 'none';
+      }
+    }
     else if (id === 'crop') {
       const pct = (parseFloat(document.getElementById('cropPct').value) || 5) / 100;
       const doc = await PDFDocument.load(b0, { ignoreEncryption: true });
@@ -1937,7 +2290,7 @@ async function executeActiveTool() {
       if (!q) { alert('Enter a keyword or regex pattern!'); return; }
       const colorName = document.getElementById('hlColor').value;
       const col = colorName === 'cyan' ? rgb(0.1, 0.85, 0.95) : colorName === 'green' ? rgb(0.2, 0.9, 0.45) : rgb(1, 0.92, 0.1);
-      const rx = new RegExp(q, 'gi');
+      const rx = buildSafeRegex(q);
       const pdf = await pdfjsLib.getDocument({ data: b0 }).promise;
       const doc = await PDFDocument.load(b0, { ignoreEncryption: true });
       let hits = 0; const hitPages = [];
@@ -2178,7 +2531,7 @@ async function executeActiveTool() {
     else if (id === 'multi_search') {
       const q = document.getElementById('msQuery').value.trim();
       if (!q) { alert('Enter a keyword or regex to search!'); return; }
-      const rx = new RegExp(q, 'gi');
+      const rx = buildSafeRegex(q);
       let totalHits = 0;
       const lines = [];
       for (const file of uploadedFiles) {
